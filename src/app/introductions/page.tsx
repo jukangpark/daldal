@@ -451,12 +451,24 @@ export default function IntroductionsPage() {
           >
             <div className="flex items-start space-x-6">
               <div className="flex-1">
-                <div className="flex items-center mb-3 space-x-3">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                    {intro.title}
-                  </h3>
+                {/* 제목 */}
+                <h3 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">
+                  {intro.title}
+                </h3>
+
+                {/* 자기소개 내용 */}
+                <p className="mb-4 text-gray-600 line-clamp-3 dark:text-gray-300">
+                  {intro.content}
+                </p>
+
+                {/* 사용자 정보 및 뱃지들 */}
+                <div className="flex flex-wrap gap-2 items-center">
                   <span className="text-sm text-gray-500 dark:text-gray-300">
-                    {intro.user_name} ({intro.user_age}세)
+                    {intro.user_name}
+                    <span className="hidden sm:inline">
+                      {" "}
+                      ({intro.user_age}세)
+                    </span>
                   </span>
                   <span
                     className={`text-xs px-2 py-1 rounded-full ${
@@ -473,10 +485,6 @@ export default function IntroductionsPage() {
                     </span>
                   )}
                 </div>
-
-                <p className="mb-4 text-gray-600 line-clamp-3 dark:text-gray-300">
-                  {intro.content}
-                </p>
               </div>
             </div>
           </div>

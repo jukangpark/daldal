@@ -238,19 +238,22 @@ const Navigation = () => {
             {/* Mobile Auth Buttons */}
             {authLoading ? (
               <>
-                <div className="px-3 py-2 text-sm text-gray-700 border-b border-gray-200 dark:text-gray-300 dark:border-gray-700">
+                <div className="flex items-center px-3 py-2 text-base font-medium text-gray-700 border-b border-gray-200 dark:text-gray-300 dark:border-gray-700">
+                  <div className="mr-3 w-5 h-5 bg-gray-200 rounded animate-pulse dark:bg-gray-600"></div>
                   <div className="w-32 h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-600"></div>
                 </div>
                 <div className="flex items-center px-3 py-2 w-full text-base font-medium rounded-md">
-                  <div className="w-16 h-5 bg-gray-200 rounded animate-pulse dark:bg-gray-600"></div>
+                  <div className="mr-3 w-5 h-5 bg-gray-200 rounded animate-pulse dark:bg-gray-600"></div>
+                  <div className="w-16 h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-600"></div>
                 </div>
               </>
             ) : user ? (
               <>
                 <Link
                   href="/profile"
-                  className="px-3 py-2 text-base text-gray-700 border-b border-gray-200 transition-colors duration-200 cursor-pointer dark:text-gray-300 dark:border-gray-700 hover:text-primary-600 dark:hover:text-primary-400"
+                  className="flex items-center px-3 py-2 w-full text-base font-medium text-gray-700 border-b border-gray-200 transition-colors duration-200 cursor-pointer dark:text-gray-300 dark:border-gray-700 hover:text-primary-600 dark:hover:text-primary-400"
                 >
+                  <User className="mr-3 w-5 h-5" />
                   {user.user_metadata?.name || user.email}님
                 </Link>
                 <button
