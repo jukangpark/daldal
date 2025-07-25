@@ -16,6 +16,7 @@ import {
   MessageCircle,
   Sun,
   Moon,
+  Gamepad2,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -85,6 +86,7 @@ const Navigation = () => {
     { href: "/super-date", label: "수퍼 데이트 신청권", icon: Heart },
     { href: "/introductions", label: "자기소개 목록", icon: FileText },
     { href: "/rules", label: "모임회칙", icon: BookOpen },
+    { href: "/dadalgame", label: "달달 게임", icon: Gamepad2 },
     {
       href: "/daldalChat",
       label: "달달톡",

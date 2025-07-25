@@ -187,4 +187,64 @@ BEGIN
   DELETE FROM online_users 
   WHERE last_seen < NOW() - INTERVAL '10 minutes';
 END;
-$$ LANGUAGE plpgsql; 
+$$ LANGUAGE plpgsql;
+
+-- 연애 가치관 테스트 결과 테이블
+CREATE TABLE IF NOT EXISTS love_test_results (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_name TEXT NOT NULL,
+  answers INTEGER[] NOT NULL,
+  personality_type TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 연애 가치관 테스트 결과 RLS 정책
+ALTER TABLE love_test_results ENABLE ROW LEVEL SECURITY;
+
+-- 모든 사용자가 테스트 결과를 읽을 수 있음 (매칭을 위해)
+CREATE POLICY "love_test_results_select_policy" ON love_test_results
+  FOR SELECT USING (true);
+
+-- 로그인한 사용자만 자신의 테스트 결과를 저장할 수 있음
+CREATE POLICY "love_test_results_insert_policy" ON love_test_results
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- 사용자는 자신의 테스트 결과만 삭제할 수 있음
+CREATE POLICY "love_test_results_delete_policy" ON love_test_results
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- 연애 가치관 테스트 결과 인덱스
+CREATE INDEX IF NOT EXISTS idx_love_test_results_user_id ON love_test_results(user_id);
+CREATE INDEX IF NOT EXISTS idx_love_test_results_created_at ON love_test_results(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_love_test_results_personality_type ON love_test_results(personality_type);
+
+-- 성적 성향 테스트 결과 테이블
+CREATE TABLE IF NOT EXISTS sexy_test_results (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_name TEXT NOT NULL,
+  answers INTEGER[] NOT NULL,
+  personality_type TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 성적 성향 테스트 결과 RLS 정책
+ALTER TABLE sexy_test_results ENABLE ROW LEVEL SECURITY;
+
+-- 모든 사용자가 테스트 결과를 읽을 수 있음 (매칭을 위해)
+CREATE POLICY "sexy_test_results_select_policy" ON sexy_test_results
+  FOR SELECT USING (true);
+
+-- 로그인한 사용자만 자신의 테스트 결과를 저장할 수 있음
+CREATE POLICY "sexy_test_results_insert_policy" ON sexy_test_results
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- 사용자는 자신의 테스트 결과만 삭제할 수 있음
+CREATE POLICY "sexy_test_results_delete_policy" ON sexy_test_results
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- 성적 성향 테스트 결과 인덱스
+CREATE INDEX IF NOT EXISTS idx_sexy_test_results_user_id ON sexy_test_results(user_id);
+CREATE INDEX IF NOT EXISTS idx_sexy_test_results_created_at ON sexy_test_results(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_sexy_test_results_personality_type ON sexy_test_results(personality_type); 
