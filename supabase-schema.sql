@@ -122,4 +122,69 @@ ADD COLUMN IF NOT EXISTS smoking_status TEXT,
 ADD COLUMN IF NOT EXISTS charm_appeal TEXT,
 ADD COLUMN IF NOT EXISTS mbti TEXT,
 ADD COLUMN IF NOT EXISTS hobbies TEXT,
-ADD COLUMN IF NOT EXISTS special_skills TEXT; 
+ADD COLUMN IF NOT EXISTS special_skills TEXT;
+
+-- 달달톡 채팅 메시지 테이블
+CREATE TABLE IF NOT EXISTS chat_messages (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  nickname TEXT NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 달달톡 타이핑 상태 테이블
+CREATE TABLE IF NOT EXISTS typing_status (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  nickname TEXT NOT NULL,
+  lastTyping TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id)
+);
+
+-- 달달톡 온라인 사용자 테이블
+CREATE TABLE IF NOT EXISTS online_users (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  nickname TEXT NOT NULL,
+  last_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id)
+);
+
+-- 채팅 관련 테이블 RLS 비활성화 (익명 접근 허용)
+ALTER TABLE chat_messages DISABLE ROW LEVEL SECURITY;
+ALTER TABLE typing_status DISABLE ROW LEVEL SECURITY;
+ALTER TABLE online_users DISABLE ROW LEVEL SECURITY;
+
+-- 채팅 메시지 인덱스
+CREATE INDEX IF NOT EXISTS idx_chat_messages_created_at ON chat_messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_user_id ON chat_messages(user_id);
+CREATE INDEX IF NOT EXISTS idx_typing_status_user_id ON typing_status(user_id);
+CREATE INDEX IF NOT EXISTS idx_online_users_user_id ON online_users(user_id);
+
+-- 오래된 메시지 자동 삭제 함수 (30일 이상 된 메시지)
+CREATE OR REPLACE FUNCTION cleanup_old_messages()
+RETURNS void AS $$
+BEGIN
+  DELETE FROM chat_messages 
+  WHERE created_at < NOW() - INTERVAL '30 days';
+END;
+$$ LANGUAGE plpgsql;
+
+-- 오래된 타이핑 상태 정리 함수
+CREATE OR REPLACE FUNCTION cleanup_old_typing_status()
+RETURNS void AS $$
+BEGIN
+  DELETE FROM typing_status 
+  WHERE lastTyping < NOW() - INTERVAL '5 minutes';
+END;
+$$ LANGUAGE plpgsql;
+
+-- 오래된 온라인 사용자 정리 함수
+CREATE OR REPLACE FUNCTION cleanup_old_online_users()
+RETURNS void AS $$
+BEGIN
+  DELETE FROM online_users 
+  WHERE last_seen < NOW() - INTERVAL '10 minutes';
+END;
+$$ LANGUAGE plpgsql; 

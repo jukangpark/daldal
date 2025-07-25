@@ -13,7 +13,7 @@ import {
   LogIn,
   LogOut,
   BookOpen,
-  Megaphone,
+  MessageCircle,
   Sun,
   Moon,
 } from "lucide-react";
@@ -85,6 +85,12 @@ const Navigation = () => {
     { href: "/super-date", label: "수퍼 데이트 신청권", icon: Heart },
     { href: "/introductions", label: "자기소개 목록", icon: FileText },
     { href: "/rules", label: "모임회칙", icon: BookOpen },
+    {
+      href: "/daldalChat",
+      label: "달달톡",
+      icon: MessageCircle,
+      requiresAuth: true,
+    },
   ];
 
   const isActive = (href: string) => pathname === href;
