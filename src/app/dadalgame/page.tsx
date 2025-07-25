@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Gamepad2, Heart, Users, Clock, Brain, Image } from "lucide-react";
+import { Gamepad2, Heart, Users, Clock, Brain, Image, Zap } from "lucide-react";
 
 interface GameItem {
   id: string;
@@ -50,6 +50,17 @@ const games: GameItem[] = [
     players: "1명",
     duration: "5분 이내",
     isPopular: true,
+  },
+  {
+    id: "reaction-speed",
+    title: "반응 속도 테스트",
+    description: "당신의 반응 속도를 측정해보세요!",
+    icon: Zap,
+    href: "/dadalgame/reaction-speed",
+    difficulty: "쉬움",
+    players: "1명",
+    duration: "2분 이내",
+    isNew: true,
   },
 ];
 
