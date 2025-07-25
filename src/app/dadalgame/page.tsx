@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Gamepad2, Heart, Users, Clock, Brain } from "lucide-react";
+import { Gamepad2, Heart, Users, Clock, Brain, Image } from "lucide-react";
 
 interface GameItem {
   id: string;
@@ -38,6 +38,17 @@ const games: GameItem[] = [
     difficulty: "어려움",
     players: "1명",
     duration: "3분 이내",
+    isPopular: true,
+  },
+  {
+    id: "catch-mind",
+    title: "캐치마인드",
+    description: "내 그림을 맞춰봐!",
+    icon: Image,
+    href: "/dadalgame/catch-mind",
+    difficulty: "보통",
+    players: "1명",
+    duration: "5분 이내",
     isPopular: true,
   },
 ];
