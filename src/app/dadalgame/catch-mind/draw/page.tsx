@@ -324,38 +324,41 @@ export default function DrawPage() {
         </div>
 
         {/* 컨트롤 버튼들 */}
-        <div className="flex justify-center mb-6 space-x-4">
+        <div className="flex flex-col gap-2 justify-center mb-6 sm:flex-row sm:gap-4">
           <button
             onClick={getNewWord}
-            className="flex items-center px-4 py-2 text-white bg-blue-600 rounded-lg transition-colors hover:bg-blue-700"
+            className="flex items-center justify-center px-4 py-1.5 sm:py-2 text-white bg-blue-600 rounded-lg transition-colors hover:bg-blue-700 text-sm sm:text-base"
           >
-            <RotateCcw className="mr-2 w-4 h-4" />새 제시어
+            <RotateCcw className="mr-2 w-4 h-4" />
+            <span className="whitespace-nowrap">새 제시어</span>
           </button>
           <button
             onClick={clearCanvas}
-            className="flex items-center px-4 py-2 text-white bg-gray-600 rounded-lg transition-colors hover:bg-gray-700"
+            className="flex items-center justify-center px-4 py-1.5 sm:py-2 text-white bg-gray-600 rounded-lg transition-colors hover:bg-gray-700 text-sm sm:text-base"
           >
             <RotateCcw className="mr-2 w-4 h-4" />
-            지우기
+            <span className="whitespace-nowrap">지우기</span>
           </button>
           <button
             onClick={saveDrawing}
             disabled={isSaved || isLoading}
-            className="flex items-center px-4 py-2 text-white bg-green-600 rounded-lg transition-colors hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center px-4 py-1.5 sm:py-2 text-white bg-green-600 rounded-lg transition-colors hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
           >
             {isLoading ? (
               <Loader2 className="mr-2 w-4 h-4 animate-spin" />
             ) : (
               <Save className="mr-2 w-4 h-4" />
             )}
-            {isSaved ? "저장됨" : isLoading ? "저장 중..." : "저장"}
+            <span className="whitespace-nowrap">
+              {isSaved ? "저장됨" : isLoading ? "저장 중..." : "저장"}
+            </span>
           </button>
           <button
             onClick={downloadDrawing}
-            className="flex items-center px-4 py-2 text-white bg-purple-600 rounded-lg transition-colors hover:bg-purple-700"
+            className="flex items-center justify-center px-4 py-1.5 sm:py-2 text-white bg-purple-600 rounded-lg transition-colors hover:bg-purple-700 text-sm sm:text-base"
           >
             <Download className="mr-2 w-4 h-4" />
-            다운로드
+            <span className="whitespace-nowrap">다운로드</span>
           </button>
         </div>
 
