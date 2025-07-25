@@ -51,10 +51,14 @@ export default function DrawPage() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    canvas.width = 400;
-    canvas.height = 400;
-    canvas.style.width = "400px";
-    canvas.style.height = "400px";
+    // 모바일에서는 더 작게, 데스크톱에서는 크게
+    const isMobile = window.innerWidth <= 768;
+    const canvasSize = isMobile ? 300 : 400;
+
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
+    canvas.style.width = `${canvasSize}px`;
+    canvas.style.height = `${canvasSize}px`;
 
     const context = canvas.getContext("2d");
     if (!context) return;
@@ -68,24 +72,73 @@ export default function DrawPage() {
     getRandomWord();
   }, []);
 
-  // 그리기 시작
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    setIsDrawing(true);
-    const { offsetX, offsetY } = e.nativeEvent;
-    contextRef.current?.beginPath();
-    contextRef.current?.moveTo(offsetX, offsetY);
+  // 캔버스 좌표 가져오기 (마우스/터치 이벤트 공통)
+  const getCanvasCoordinates = (
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
+  ) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    if ("touches" in e) {
+      // 터치 이벤트
+      const touch = e.touches[0];
+      return {
+        x: (touch.clientX - rect.left) * scaleX,
+        y: (touch.clientY - rect.top) * scaleY,
+      };
+    } else {
+      // 마우스 이벤트
+      return {
+        x: (e.nativeEvent.clientX - rect.left) * scaleX,
+        y: (e.nativeEvent.clientY - rect.top) * scaleY,
+      };
+    }
   };
 
-  // 그리기 중
+  // 그리기 시작 (마우스)
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    setIsDrawing(true);
+    const { x, y } = getCanvasCoordinates(e);
+    contextRef.current?.beginPath();
+    contextRef.current?.moveTo(x, y);
+  };
+
+  // 그리기 중 (마우스)
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
-    const { offsetX, offsetY } = e.nativeEvent;
-    contextRef.current?.lineTo(offsetX, offsetY);
+    const { x, y } = getCanvasCoordinates(e);
+    contextRef.current?.lineTo(x, y);
     contextRef.current?.stroke();
   };
 
-  // 그리기 종료
+  // 그리기 종료 (마우스)
   const stopDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  // 터치 이벤트 핸들러들
+  const startDrawingTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault(); // 스크롤 방지
+    setIsDrawing(true);
+    const { x, y } = getCanvasCoordinates(e);
+    contextRef.current?.beginPath();
+    contextRef.current?.moveTo(x, y);
+  };
+
+  const drawTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault(); // 스크롤 방지
+    if (!isDrawing) return;
+    const { x, y } = getCanvasCoordinates(e);
+    contextRef.current?.lineTo(x, y);
+    contextRef.current?.stroke();
+  };
+
+  const stopDrawingTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault(); // 스크롤 방지
     setIsDrawing(false);
   };
 
@@ -256,8 +309,16 @@ export default function DrawPage() {
               onMouseMove={draw}
               onMouseUp={stopDrawing}
               onMouseLeave={stopDrawing}
-              className="bg-white rounded-lg border-2 border-gray-300 cursor-crosshair dark:border-gray-600"
-              style={{ touchAction: "none" }}
+              onTouchStart={startDrawingTouch}
+              onTouchMove={drawTouch}
+              onTouchEnd={stopDrawingTouch}
+              className="bg-white rounded-lg border-2 border-gray-300 select-none cursor-crosshair dark:border-gray-600"
+              style={{
+                touchAction: "none",
+                userSelect: "none",
+                WebkitUserSelect: "none",
+                WebkitTouchCallout: "none",
+              }}
             />
           </div>
         </div>
