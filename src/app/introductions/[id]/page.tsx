@@ -187,22 +187,30 @@ export default function IntroductionDetailPage() {
   // 날짜 포맷팅 함수
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const now = new Date();
-    const diffInMs = now.getTime() - date.getTime();
-    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
-    if (diffInMinutes < 1) return "방금 전";
-    if (diffInMinutes < 60) return `${diffInMinutes}분 전`;
-    if (diffInHours < 24) return `${diffInHours}시간 전`;
-    if (diffInDays < 7) return `${diffInDays}일 전`;
+    if (isNaN(date.getTime())) {
+      console.error("Invalid date:", dateString);
+      return "날짜 오류";
+    }
 
-    return date.toLocaleDateString("ko-KR", {
+    // UTC 기준으로 날짜와 시간 표시 (오전/오후 구분)
+    const formatted = date.toLocaleString("ko-KR", {
+      timeZone: "UTC",
       year: "numeric",
-      month: "long",
-      day: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
     });
+
+    // 0을 제거하여 "오후 9시 30분" 형태로 변환
+    return formatted
+      .replace(/오전 0(\d):/, "오전 $1:")
+      .replace(/오후 0(\d):/, "오후 $1:")
+      .replace(/오전 (\d+):/, "오전 $1시 ")
+      .replace(/오후 (\d+):/, "오후 $1시 ")
+      .replace(/:(\d+)/, "$1분");
   };
 
   if (loading) {
