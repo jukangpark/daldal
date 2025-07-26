@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+
+// 이 페이지는 클라이언트에서만 렌더링 (SSR 비활성화)
+export const dynamic = "force-dynamic";
+export const runtime = "edge";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { selfIntroductionAPI, fileAPI } from "@/lib/supabase";
