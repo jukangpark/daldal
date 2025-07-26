@@ -86,20 +86,27 @@ export interface CreateSelfIntroductionData {
   special_skills?: string;
 }
 
-export interface SuperDateRequest {
+export interface SuperDateVote {
   id: string;
-  requester_id: string;
-  requester_name: string;
+  voter_id: string;
   target_id: string;
-  target_name: string;
-  message: string;
-  status: "pending" | "accepted" | "rejected";
   created_at: string;
+}
+
+export interface SuperDateMatch {
+  id: string;
+  user1_id: string;
+  user2_id: string;
+  matched_at: string;
+}
+
+export interface CreateSuperDateVoteData {
+  target_id: string;
 }
 
 export interface CreateSuperDateRequestData {
   target_id: string;
-  message: string;
+  target_name: string;
 }
 
 // 댓글 타입
@@ -354,7 +361,6 @@ export const superDateAPI = {
           requester_id: user.id,
           requester_name: user.user_metadata?.name || user.email,
           ...requestData,
-          status: "pending",
         },
       ])
       .select()
@@ -367,6 +373,17 @@ export const superDateAPI = {
     const { data, error } = await supabase
       .from("super_date_requests")
       .update({ status })
+      .eq("id", id)
+      .select()
+      .single();
+    return { data, error };
+  },
+
+  // 수퍼데이트 신청 취소
+  async cancel(id: string) {
+    const { data, error } = await supabase
+      .from("super_date_requests")
+      .delete()
       .eq("id", id)
       .select()
       .single();

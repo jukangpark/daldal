@@ -10,11 +10,14 @@ import {
   Plus,
   Loader2,
   Calendar,
-  MapPin,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { selfIntroductionAPI, SelfIntroduction } from "@/lib/supabase";
+import {
+  selfIntroductionAPI,
+  superDateAPI,
+  SelfIntroduction,
+} from "@/lib/supabase";
 import LoginModal from "@/components/LoginModal";
 import SignupModal from "@/components/SignupModal";
 
@@ -35,6 +38,12 @@ export default function IntroductionsPage() {
   const [error, setError] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
+  const [loadingRequests, setLoadingRequests] = useState<Set<string>>(
+    new Set()
+  );
+  const [remainingRequests, setRemainingRequests] = useState<number>(2);
+  const [matches, setMatches] = useState<any[]>([]);
 
   // 자기소개서 데이터 로드
   useEffect(() => {
@@ -58,6 +67,30 @@ export default function IntroductionsPage() {
 
     loadIntroductions();
   }, []);
+
+  // 사용자가 보낸 수퍼데이트 신청 로드
+  useEffect(() => {
+    const loadSentRequests = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await superDateAPI.getSentByUserId(user.id);
+        if (error) {
+          console.error("수퍼데이트 신청 로드 오류:", error);
+        } else {
+          const requestIds = new Set(data?.map((req) => req.target_id) || []);
+          setSentRequests(requestIds);
+          // 잔여 신청권 계산 (2개 제한)
+          const usedRequests = data?.length || 0;
+          setRemainingRequests(Math.max(0, 2 - usedRequests));
+        }
+      } catch (err) {
+        console.error("수퍼데이트 신청 로드 오류:", err);
+      }
+    };
+
+    loadSentRequests();
+  }, [user]);
 
   const filteredIntroductions = introductions.filter((intro) => {
     const matchesSearch =
@@ -102,6 +135,107 @@ export default function IntroductionsPage() {
     female: introductions.filter((intro) => intro.user_gender === "female")
       .length,
     total: introductions.length,
+  };
+
+  // 수퍼데이트 신청하기
+  const handleSuperDateRequest = async (
+    targetId: string,
+    targetName: string
+  ) => {
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    if (targetId === user.id) {
+      alert("자신에게는 수퍼데이트를 신청할 수 없습니다.");
+      return;
+    }
+
+    // 신청 개수 제한 확인 (2개)
+    if (remainingRequests <= 0) {
+      alert(
+        "수퍼데이트 신청은 하루에 2개까지만 가능합니다. 기존 신청을 취소하고 다시 시도해주세요."
+      );
+      return;
+    }
+
+    setLoadingRequests((prev) => new Set(prev).add(targetId));
+
+    try {
+      const { data, error } = await superDateAPI.create({
+        target_id: targetId,
+        target_name: targetName,
+      });
+
+      if (error) {
+        console.error("수퍼데이트 신청 오류:", error);
+        alert("수퍼데이트 신청에 실패했습니다.");
+      } else {
+        setSentRequests((prev) => new Set(prev).add(targetId));
+        setRemainingRequests((prev) => Math.max(0, prev - 1));
+        alert("수퍼데이트 신청이 완료되었습니다!");
+      }
+    } catch (err) {
+      console.error("수퍼데이트 신청 오류:", err);
+      alert("수퍼데이트 신청에 실패했습니다.");
+    } finally {
+      setLoadingRequests((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(targetId);
+        return newSet;
+      });
+    }
+  };
+
+  // 수퍼데이트 신청 취소하기
+  const handleSuperDateCancel = async (targetId: string) => {
+    if (!user) return;
+
+    setLoadingRequests((prev) => new Set(prev).add(targetId));
+
+    try {
+      // 먼저 해당 신청을 찾기
+      const { data: requests, error: fetchError } =
+        await superDateAPI.getSentByUserId(user.id);
+
+      if (fetchError) {
+        console.error("신청 조회 오류:", fetchError);
+        alert("신청 취소에 실패했습니다.");
+        return;
+      }
+
+      const request = requests?.find((req) => req.target_id === targetId);
+      if (!request) {
+        alert("해당 신청을 찾을 수 없습니다.");
+        return;
+      }
+
+      // delete 함수가 없으므로 updateStatus로 'cancelled' 상태로 변경
+      const { error } = await superDateAPI.cancel(request.id);
+
+      if (error) {
+        console.error("수퍼데이트 신청 취소 오류:", error);
+        alert("신청 취소에 실패했습니다.");
+      } else {
+        setSentRequests((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(targetId);
+          return newSet;
+        });
+        setRemainingRequests((prev) => Math.min(2, prev + 1));
+        alert("수퍼데이트 신청이 취소되었습니다.");
+      }
+    } catch (err) {
+      console.error("수퍼데이트 신청 취소 오류:", err);
+      alert("신청 취소에 실패했습니다.");
+    } finally {
+      setLoadingRequests((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(targetId);
+        return newSet;
+      });
+    }
   };
 
   if (loading) {
@@ -183,6 +317,32 @@ export default function IntroductionsPage() {
             </button>
           )}
         </div>
+
+        {/* 수퍼데이트 신청권 표시 */}
+        {user && (
+          <div className="p-4 mt-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg border border-pink-200 dark:from-pink-900/20 dark:to-purple-900/20 dark:border-pink-700">
+            <div className="flex justify-center items-center space-x-2">
+              <Calendar className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                수퍼데이트 신청권:
+              </span>
+              <span
+                className={`text-lg font-bold ${
+                  remainingRequests > 0
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
+              >
+                {remainingRequests}개 남음
+              </span>
+              {remainingRequests === 0 && (
+                <span className="ml-2 text-xs text-red-500 dark:text-red-400">
+                  (기존 신청을 취소하면 다시 신청할 수 있습니다)
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 검색 및 필터 */}
@@ -462,27 +622,80 @@ export default function IntroductionsPage() {
                 </p>
 
                 {/* 사용자 정보 및 뱃지들 */}
-                <div className="flex flex-wrap gap-2 items-center">
-                  <span className="text-sm text-gray-500 dark:text-gray-300">
-                    {intro.user_name}
-                    <span className="hidden sm:inline">
-                      {" "}
-                      ({intro.user_age}세)
+                <div className="flex flex-wrap gap-2 justify-between items-center">
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <span className="text-sm text-gray-500 dark:text-gray-300">
+                      {intro.user_name}
+                      <span className="hidden sm:inline">
+                        {" "}
+                        ({intro.user_age}세)
+                      </span>
                     </span>
-                  </span>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      intro.user_gender === "male"
-                        ? "bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-white"
-                        : "bg-pink-100 text-pink-700 dark:bg-pink-600 dark:text-white"
-                    }`}
-                  >
-                    {intro.user_gender === "male" ? "남성" : "여성"}
-                  </span>
-                  {intro.mbti && (
-                    <span className="px-2 py-1 text-xs text-purple-700 bg-purple-100 rounded-full dark:bg-purple-600 dark:text-white">
-                      {intro.mbti}
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        intro.user_gender === "male"
+                          ? "bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-white"
+                          : "bg-pink-100 text-pink-700 dark:bg-pink-600 dark:text-white"
+                      }`}
+                    >
+                      {intro.user_gender === "male" ? "남성" : "여성"}
                     </span>
+                    {intro.mbti && (
+                      <span className="px-2 py-1 text-xs text-purple-700 bg-purple-100 rounded-full dark:bg-purple-600 dark:text-white">
+                        {intro.mbti}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* 수퍼데이트 버튼 */}
+                  {user && user.id !== intro.user_id && (
+                    <div className="flex gap-2">
+                      {sentRequests.has(intro.user_id) ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSuperDateCancel(intro.user_id);
+                          }}
+                          disabled={loadingRequests.has(intro.user_id)}
+                          className="flex items-center px-3 py-1 text-xs font-medium text-red-600 bg-red-100 rounded-full transition-colors hover:bg-red-200 disabled:opacity-50 dark:bg-red-600 dark:text-white dark:hover:bg-red-700"
+                        >
+                          {loadingRequests.has(intro.user_id) ? (
+                            <Loader2 className="mr-1 w-3 h-3 animate-spin" />
+                          ) : (
+                            <Calendar className="mr-1 w-3 h-3" />
+                          )}
+                          신청 취소
+                        </button>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSuperDateRequest(
+                              intro.user_id,
+                              intro.user_name
+                            );
+                          }}
+                          disabled={
+                            loadingRequests.has(intro.user_id) ||
+                            remainingRequests <= 0
+                          }
+                          className={`flex items-center px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                            remainingRequests > 0
+                              ? "text-white bg-primary-600 hover:bg-primary-700"
+                              : "text-gray-400 bg-gray-200 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"
+                          } disabled:opacity-50`}
+                        >
+                          {loadingRequests.has(intro.user_id) ? (
+                            <Loader2 className="mr-1 w-3 h-3 animate-spin" />
+                          ) : (
+                            <Calendar className="mr-1 w-3 h-3" />
+                          )}
+                          {remainingRequests > 0
+                            ? "수퍼데이트 신청"
+                            : "신청권 소진"}
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

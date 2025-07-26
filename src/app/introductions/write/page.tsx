@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { selfIntroductionAPI, SelfIntroduction, fileAPI } from "@/lib/supabase";
+import { selfIntroductionAPI, fileAPI } from "@/lib/supabase";
 import {
   ArrowLeft,
   Save,
@@ -17,7 +17,6 @@ import {
 
 export default function WriteIntroductionPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: "",
@@ -37,7 +36,6 @@ export default function WriteIntroductionPage() {
     special_skills: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [submitAbortController, setSubmitAbortController] =

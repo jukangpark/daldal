@@ -6,23 +6,20 @@ import Link from "next/link";
 import {
   MapPin,
   Calendar,
-  Heart,
-  MessageCircle,
   Plus,
   Loader2,
   User,
   Gift,
-  Eye,
-  ArrowLeft,
-  Star,
   Edit,
   Trash2,
   ChevronLeft,
   ChevronRight,
+  HelpCircle,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   selfIntroductionAPI,
+  superDateAPI,
   SelfIntroduction,
   supabase,
 } from "@/lib/supabase";
@@ -34,15 +31,43 @@ export default function ProfilePage() {
   const [loadingSelfIntro, setLoadingSelfIntro] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 연결된 이성 정보 (임시 데이터 - 실제로는 API에서 가져와야 함)
-  const [connectedPerson, setConnectedPerson] = useState<{
-    id: string;
-    name: string;
-    age: number;
-    location: string;
-    photo: string;
-    introduction: string;
-  } | null>(null);
+  // 나를 선택한 이성 정보
+  const [peopleWhoSelectedMe, setPeopleWhoSelectedMe] = useState<
+    Array<{
+      id: string;
+      name: string;
+      age: number;
+      location: string;
+      photo: string;
+      introduction: string;
+      created_at: string;
+      introduction_id: string;
+    }>
+  >([]);
+
+  const [loadingPeopleWhoSelectedMe, setLoadingPeopleWhoSelectedMe] =
+    useState(true);
+
+  // 연결된 이성 정보
+  const [connectedPeople, setConnectedPeople] = useState<
+    Array<{
+      id: string;
+      name: string;
+      age: number;
+      location: string;
+      photo: string;
+      introduction: string;
+      matched_at: string;
+      introduction_id: string;
+    }>
+  >([]);
+
+  const [loadingConnectedPeople, setLoadingConnectedPeople] = useState(true);
+
+  // 수퍼데이트 신청 관련 상태 (introductions 페이지에서 가져온 것)
+  const [remainingRequests, setRemainingRequests] = useState<number>(2);
+
+  console.log("connectedPeople", connectedPeople);
 
   // 슈퍼 데이트 신청권 상태
   const [hasSuperDateTicket, setHasSuperDateTicket] = useState(false);
@@ -65,6 +90,8 @@ export default function ProfilePage() {
 
     if (user) {
       loadSelfIntroduction();
+      loadPeopleWhoSelectedMe();
+      loadConnectedPeople();
     }
   }, [user, loading, router]);
 
@@ -97,6 +124,186 @@ export default function ProfilePage() {
       setError("자기소개서를 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoadingSelfIntro(false);
+    }
+  };
+
+  // 나를 선택한 이성 데이터 로드 (익명 처리)
+  const loadPeopleWhoSelectedMe = async () => {
+    try {
+      setLoadingPeopleWhoSelectedMe(true);
+
+      // 내가 받은 신청들 가져오기
+      const { data: receivedRequests, error: receivedError } =
+        await superDateAPI.getReceivedByUserId(user!.id);
+
+      if (receivedError) {
+        console.error("받은 신청 로드 오류:", receivedError);
+        return;
+      }
+
+      // 내가 보낸 신청들 가져오기 (매칭 확인용)
+      const { data: sentRequests, error: sentError } =
+        await superDateAPI.getSentByUserId(user!.id);
+
+      if (sentError) {
+        console.error("보낸 신청 로드 오류:", sentError);
+        return;
+      }
+
+      // 나를 선택했지만 내가 아직 선택하지 않은 사람들 찾기 (익명 처리)
+      const peopleWhoSelectedMeData: Array<{
+        id: string;
+        name: string;
+        age: number;
+        location: string;
+        photo: string;
+        introduction: string;
+        created_at: string;
+        introduction_id: string;
+      }> = [];
+
+      for (const receivedRequest of receivedRequests || []) {
+        // 내가 이 사람을 선택했는지 확인
+        const didISelectThem = sentRequests?.some(
+          (sent) => sent.target_id === receivedRequest.requester_id
+        );
+
+        // 내가 아직 선택하지 않은 경우만 포함
+        if (!didISelectThem) {
+          // 익명으로 처리 - 실제 정보는 가져오지 않음
+          peopleWhoSelectedMeData.push({
+            id: receivedRequest.requester_id,
+            name: "익명", // 익명 처리
+            age: 0, // 나이 숨김
+            location: "비공개", // 지역 숨김
+            photo: "/default-avatar.png", // 기본 아바타
+            introduction:
+              "이 사람이 나를 선택했습니다. 수퍼데이트 신청을 통해 서로를 알아갈 수 있습니다.", // 기본 메시지
+            created_at: receivedRequest.created_at,
+            introduction_id: "", // 자기소개서 ID 숨김
+          });
+        }
+      }
+
+      setPeopleWhoSelectedMe(peopleWhoSelectedMeData);
+    } catch (err) {
+      console.error("나를 선택한 이성 로드 오류:", err);
+    } finally {
+      setLoadingPeopleWhoSelectedMe(false);
+    }
+  };
+
+  // 수퍼데이트 신청하기
+  const handleSuperDateRequest = async (
+    targetId: string,
+    targetName: string
+  ) => {
+    if (!user) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    if (targetId === user.id) {
+      alert("자신에게는 수퍼데이트를 신청할 수 없습니다.");
+      return;
+    }
+
+    // 신청 개수 제한 확인 (2개)
+    if (remainingRequests <= 0) {
+      alert(
+        "수퍼데이트 신청은 하루에 2개까지만 가능합니다. 기존 신청을 취소하고 다시 시도해주세요."
+      );
+      return;
+    }
+
+    try {
+      const { data, error } = await superDateAPI.create({
+        target_id: targetId,
+        target_name: targetName,
+      });
+
+      if (error) {
+        console.error("수퍼데이트 신청 오류:", error);
+        alert("수퍼데이트 신청에 실패했습니다.");
+      } else {
+        setRemainingRequests((prev) => Math.max(0, prev - 1));
+        alert("수퍼데이트 신청이 완료되었습니다!");
+        // 데이터 새로고침
+        loadPeopleWhoSelectedMe();
+        loadConnectedPeople();
+      }
+    } catch (err) {
+      console.error("수퍼데이트 신청 오류:", err);
+      alert("수퍼데이트 신청에 실패했습니다.");
+    }
+  };
+
+  // 연결된 이성 데이터 로드
+  const loadConnectedPeople = async () => {
+    try {
+      setLoadingConnectedPeople(true);
+
+      // 내가 보낸 신청들 가져오기
+      const { data: sentRequests, error: sentError } =
+        await superDateAPI.getSentByUserId(user!.id);
+
+      if (sentError) {
+        console.error("보낸 신청 로드 오류:", sentError);
+        return;
+      }
+
+      // 내가 받은 신청들 가져오기
+      const { data: receivedRequests, error: receivedError } =
+        await superDateAPI.getReceivedByUserId(user!.id);
+
+      if (receivedError) {
+        console.error("받은 신청 로드 오류:", receivedError);
+        return;
+      }
+
+      // 서로 신청한 사람들 찾기 (매칭)
+      const connectedPeopleData: Array<{
+        id: string;
+        name: string;
+        age: number;
+        location: string;
+        photo: string;
+        introduction: string;
+        matched_at: string;
+        introduction_id: string; // 자기소개서 ID 추가
+      }> = [];
+
+      for (const sentRequest of sentRequests || []) {
+        const isMatched = receivedRequests?.some(
+          (received) => received.requester_id === sentRequest.target_id
+        );
+
+        if (isMatched) {
+          // 매칭된 사람의 자기소개서 정보 가져오기
+          const { data: introData } = await selfIntroductionAPI.getByUserId(
+            sentRequest.target_id
+          );
+
+          if (introData) {
+            connectedPeopleData.push({
+              id: sentRequest.target_id,
+              name: sentRequest.target_name,
+              age: introData.user_age,
+              location: introData.user_location,
+              photo: introData.photos?.[0] || "/default-avatar.png",
+              introduction: introData.content,
+              matched_at: sentRequest.created_at,
+              introduction_id: introData.id, // 자기소개서 ID 저장
+            });
+          }
+        }
+      }
+
+      setConnectedPeople(connectedPeopleData);
+    } catch (err) {
+      console.error("연결된 이성 로드 오류:", err);
+    } finally {
+      setLoadingConnectedPeople(false);
     }
   };
 
@@ -142,15 +349,10 @@ export default function ProfilePage() {
   }
 
   // 슈퍼 데이트 신청권 사용
-  const handleUseSuperDateTicket = () => {
-    if (!connectedPerson) {
-      alert("연결된 이성이 없습니다.");
-      return;
-    }
-
+  const handleUseSuperDateTicket = (personName: string) => {
     if (
       confirm(
-        `${connectedPerson.name}님과 슈퍼 데이트를 진행하시겠습니까?\n\n이 데이트는 필수로 진행되어야 합니다.`
+        `${personName}님과 슈퍼 데이트를 진행하시겠습니까?\n\n이 데이트는 필수로 진행되어야 합니다.`
       )
     ) {
       // 실제로는 API 호출로 데이트 상태 업데이트
@@ -527,16 +729,94 @@ export default function ProfilePage() {
         </div>
       )}
 
+      {/* 나를 선택한 이성 정보 */}
+      <div className="mt-8">
+        <div className="card">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              나를 선택한 이성 ({peopleWhoSelectedMe.length}명)
+            </h2>
+            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+              <HelpCircle className="mr-1 w-4 h-4" />
+              <span>나를 선택했지만 아직 내가 선택하지 않은 사람들</span>
+            </div>
+          </div>
+
+          {loadingPeopleWhoSelectedMe ? (
+            <div className="py-12 text-center">
+              <div className="flex justify-center items-center mx-auto mb-4 w-16 h-16">
+                <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+              </div>
+              <p className="text-lg text-gray-500 dark:text-gray-400">
+                나를 선택한 이성을 불러오는 중...
+              </p>
+            </div>
+          ) : peopleWhoSelectedMe.length > 0 ? (
+            <div className="space-y-6">
+              {peopleWhoSelectedMe.map((person, index) => (
+                <div
+                  key={person.id}
+                  className="p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="grid gap-6 md:grid-cols-2">
+                    {/* 익명 프로필 */}
+                    <div className="flex items-start space-x-4">
+                      <div className="flex justify-center items-center w-20 h-20 bg-gray-100 rounded-full dark:bg-gray-700">
+                        <HelpCircle className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                          익명
+                        </h3>
+                        <div className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                          <div className="flex items-center">
+                            <span className="text-gray-500 dark:text-gray-400">
+                              나를 선택한 사람
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              선택한 날:{" "}
+                              {new Date(person.created_at).toLocaleDateString(
+                                "ko-KR"
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center">
+              <div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 bg-gray-100 rounded-full dark:bg-gray-700">
+                <HelpCircle className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+              </div>
+              <p className="text-lg text-gray-500 dark:text-gray-400">
+                아직 나를 선택한 이성이 없습니다
+              </p>
+              <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">
+                자기소개서를 작성하고 다른 사람들에게 어필해보세요
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* 연결된 이성 정보 */}
       <div className="mt-8">
         <div className="card">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              연결된 이성
+              연결된 이성 ({connectedPeople.length}명)
             </h2>
-            {hasSuperDateTicket && connectedPerson && (
+            {hasSuperDateTicket && connectedPeople.length > 0 && (
               <button
-                onClick={handleUseSuperDateTicket}
+                onClick={() =>
+                  handleUseSuperDateTicket(connectedPeople[0].name)
+                }
                 className="flex items-center px-4 py-2 text-white rounded-lg transition-colors bg-primary-600 hover:bg-primary-700"
               >
                 <Gift className="mr-2 w-4 h-4" />
@@ -545,41 +825,94 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {connectedPerson ? (
-            <div className="grid gap-6 md:grid-cols-2">
-              {/* 상대방 프로필 */}
-              <div className="flex items-start space-x-4">
-                <img
-                  src={connectedPerson.photo}
-                  alt={connectedPerson.name}
-                  className="object-cover w-20 h-20 rounded-full"
-                />
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {connectedPerson.name}
-                  </h3>
-                  <div className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-300">
-                    <div className="flex items-center">
-                      <Calendar className="mr-2 w-4 h-4" />
-                      {connectedPerson.age}세
+          {loadingConnectedPeople ? (
+            <div className="py-12 text-center">
+              <div className="flex justify-center items-center mx-auto mb-4 w-16 h-16">
+                <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+              </div>
+              <p className="text-lg text-gray-500 dark:text-gray-400">
+                연결된 이성을 불러오는 중...
+              </p>
+            </div>
+          ) : connectedPeople.length > 0 ? (
+            <div className="space-y-6">
+              {connectedPeople.map((person, index) => (
+                <div
+                  key={person.id}
+                  className="p-4 rounded-lg border border-gray-200 transition-all duration-200 cursor-pointer dark:border-gray-700"
+                  onClick={() =>
+                    router.push(`/introductions/${person.introduction_id}`)
+                  }
+                >
+                  <div className="grid gap-6 md:grid-cols-2">
+                    {/* 상대방 프로필 */}
+                    <div className="flex items-start space-x-4">
+                      {person.photo &&
+                      person.photo !== "/default-avatar.png" ? (
+                        <img
+                          src={person.photo}
+                          alt={person.name}
+                          className="object-cover w-20 h-20 rounded-full"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "/default-avatar.png";
+                          }}
+                        />
+                      ) : (
+                        <div className="flex justify-center items-center w-20 h-20 bg-gray-100 rounded-full dark:bg-gray-700">
+                          <User className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                          {person.name}
+                        </h3>
+                        <div className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                          <div className="flex items-center">
+                            <Calendar className="mr-2 w-4 h-4" />
+                            {person.age}세
+                          </div>
+                          <div className="flex items-center">
+                            <MapPin className="mr-2 w-4 h-4" />
+                            {person.location}
+                          </div>
+                          <div className="flex items-center">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              매칭된 날:{" "}
+                              {new Date(person.matched_at).toLocaleDateString(
+                                "ko-KR"
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center">
-                      <MapPin className="mr-2 w-4 h-4" />
-                      {connectedPerson.location}
+
+                    {/* 상대방 자기소개 미리보기 */}
+                    <div>
+                      <h4 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
+                        자기소개
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
+                        {person.introduction}
+                      </p>
+                      <div className="flex mt-3 space-x-2">
+                        {hasSuperDateTicket && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation(); // 카드 클릭 이벤트 방지
+                              handleUseSuperDateTicket(person.name);
+                            }}
+                            className="px-3 py-1 text-xs text-white rounded-full transition-colors bg-primary-600 hover:bg-primary-700"
+                          >
+                            슈퍼데이트 신청
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* 상대방 자기소개 미리보기 */}
-              <div>
-                <h4 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-                  자기소개
-                </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
-                  {connectedPerson.introduction}
-                </p>
-              </div>
+              ))}
             </div>
           ) : (
             <div className="py-12 text-center">
@@ -590,8 +923,18 @@ export default function ProfilePage() {
                 현재 나와 연결된 이성이 없습니다
               </p>
               <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">
-                슈퍼 데이트 신청권 페이지에서 마음에 드는 상대에게 투표해보세요
+                자기소개서 목록에서 마음에 드는 상대에게 수퍼데이트를
+                신청해보세요
               </p>
+              <div className="mt-4">
+                <Link
+                  href="/introductions"
+                  className="inline-flex items-center px-4 py-2 text-white rounded-lg transition-colors bg-primary-600 hover:bg-primary-700"
+                >
+                  <User className="mr-2 w-4 h-4" />
+                  자기소개서 목록 보기
+                </Link>
+              </div>
             </div>
           )}
         </div>
@@ -616,7 +959,7 @@ export default function ProfilePage() {
                 type="password"
                 value={deletePassword}
                 onChange={(e) => setDeletePassword(e.target.value)}
-                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 placeholder="비밀번호를 입력하세요"
               />
               {deleteError && (

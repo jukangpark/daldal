@@ -19,32 +19,37 @@ CREATE TABLE IF NOT EXISTS self_introductions (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 수퍼데이트 신청 테이블
-CREATE TABLE IF NOT EXISTS super_date_requests (
+-- 슈퍼데이트 투표 테이블 (익명 투표)
+CREATE TABLE IF NOT EXISTS super_date_votes (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  requester_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  requester_name TEXT NOT NULL,
+  voter_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   target_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  target_name TEXT NOT NULL,
-  message TEXT NOT NULL,
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(voter_id, target_id) -- 한 사용자가 같은 대상에게 중복 투표 불가
 );
 
--- RLS (Row Level Security) 활성화
-ALTER TABLE self_introductions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE super_date_requests ENABLE ROW LEVEL SECURITY;
+-- 슈퍼데이트 연결 테이블 (서로 투표한 경우)
+CREATE TABLE IF NOT EXISTS super_date_matches (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user1_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  user2_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  matched_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user1_id, user2_id) -- 중복 매칭 방지
+);
+
 
 -- 기존 정책 삭제 (있다면)
 DROP POLICY IF EXISTS "자기소개서 읽기 정책" ON self_introductions;
 DROP POLICY IF EXISTS "자기소개서 작성 정책" ON self_introductions;
 DROP POLICY IF EXISTS "자기소개서 수정 정책" ON self_introductions;
 DROP POLICY IF EXISTS "자기소개서 삭제 정책" ON self_introductions;
-DROP POLICY IF EXISTS "수퍼데이트 신청 읽기 정책" ON super_date_requests;
-DROP POLICY IF EXISTS "수퍼데이트 신청 작성 정책" ON super_date_requests;
-DROP POLICY IF EXISTS "수퍼데이트 신청 수정 정책" ON super_date_requests;
+DROP POLICY IF EXISTS "super_date_votes_select_policy" ON super_date_votes;
+DROP POLICY IF EXISTS "super_date_votes_insert_policy" ON super_date_votes;
+DROP POLICY IF EXISTS "super_date_votes_delete_policy" ON super_date_votes;
+DROP POLICY IF EXISTS "super_date_matches_select_policy" ON super_date_matches;
+DROP POLICY IF EXISTS "super_date_matches_insert_policy" ON super_date_matches;
 
--- 자기소개서 RLS 정책 (새로 생성)
+-- 자기소개서 RLS 정책
 -- 모든 사용자가 자기소개서를 읽을 수 있음
 CREATE POLICY "self_introductions_select_policy" ON self_introductions
   FOR SELECT USING (true);
@@ -61,18 +66,27 @@ CREATE POLICY "self_introductions_update_policy" ON self_introductions
 CREATE POLICY "self_introductions_delete_policy" ON self_introductions
   FOR DELETE USING (auth.uid() = user_id);
 
--- 수퍼데이트 신청 RLS 정책 (새로 생성)
--- 사용자는 자신이 보낸 신청을 읽을 수 있음
-CREATE POLICY "super_date_requests_select_policy" ON super_date_requests
-  FOR SELECT USING (auth.uid() = requester_id OR auth.uid() = target_id);
+-- 슈퍼데이트 투표 RLS 정책
+-- 사용자는 자신이 투표한 내역을 볼 수 있음
+CREATE POLICY "super_date_votes_select_policy" ON super_date_votes
+  FOR SELECT USING (auth.uid() = voter_id);
 
--- 로그인한 사용자만 수퍼데이트 신청을 보낼 수 있음
-CREATE POLICY "super_date_requests_insert_policy" ON super_date_requests
-  FOR INSERT WITH CHECK (auth.uid() = requester_id);
+-- 로그인한 사용자만 투표할 수 있음
+CREATE POLICY "super_date_votes_insert_policy" ON super_date_votes
+  FOR INSERT WITH CHECK (auth.uid() = voter_id);
 
--- 사용자는 자신이 받은 신청의 상태를 수정할 수 있음
-CREATE POLICY "super_date_requests_update_policy" ON super_date_requests
-  FOR UPDATE USING (auth.uid() = target_id);
+-- 사용자는 자신이 투표한 내역을 삭제할 수 있음
+CREATE POLICY "super_date_votes_delete_policy" ON super_date_votes
+  FOR DELETE USING (auth.uid() = voter_id);
+
+-- 슈퍼데이트 매칭 RLS 정책
+-- 사용자는 자신이 포함된 매칭을 볼 수 있음
+CREATE POLICY "super_date_matches_select_policy" ON super_date_matches
+  FOR SELECT USING (auth.uid() = user1_id OR auth.uid() = user2_id);
+
+-- 시스템에서만 매칭을 생성할 수 있음 (RLS 우회 필요)
+CREATE POLICY "super_date_matches_insert_policy" ON super_date_matches
+  FOR INSERT WITH CHECK (true);
 
 -- 함수: 조회수 증가
 CREATE OR REPLACE FUNCTION increment_views()
@@ -90,13 +104,43 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- 함수: 투표 받은 수 계산
+CREATE OR REPLACE FUNCTION get_vote_count(target_user_id UUID)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN (
+    SELECT COUNT(*) 
+    FROM super_date_votes 
+    WHERE target_id = target_user_id
+  );
+END;
+$$ LANGUAGE plpgsql;
+
+-- 함수: 서로 투표한 사용자 매칭 생성
+CREATE OR REPLACE FUNCTION create_matches()
+RETURNS void AS $$
+BEGIN
+  -- 서로 투표한 사용자들을 찾아서 매칭 생성
+  INSERT INTO super_date_matches (user1_id, user2_id)
+  SELECT DISTINCT 
+    LEAST(v1.voter_id, v2.voter_id) as user1_id,
+    GREATEST(v1.voter_id, v2.voter_id) as user2_id
+  FROM super_date_votes v1
+  INNER JOIN super_date_votes v2 ON v1.voter_id = v2.target_id AND v2.voter_id = v1.target_id
+  WHERE v1.voter_id < v2.voter_id
+  ON CONFLICT (user1_id, user2_id) DO NOTHING;
+END;
+$$ LANGUAGE plpgsql;
+
 -- 인덱스 생성
 CREATE INDEX IF NOT EXISTS idx_self_introductions_user_id ON self_introductions(user_id);
 CREATE INDEX IF NOT EXISTS idx_self_introductions_created_at ON self_introductions(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_self_introductions_user_gender ON self_introductions(user_gender);
-CREATE INDEX IF NOT EXISTS idx_super_date_requests_requester_id ON super_date_requests(requester_id);
-CREATE INDEX IF NOT EXISTS idx_super_date_requests_target_id ON super_date_requests(target_id);
-CREATE INDEX IF NOT EXISTS idx_super_date_requests_created_at ON super_date_requests(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_super_date_votes_voter_id ON super_date_votes(voter_id);
+CREATE INDEX IF NOT EXISTS idx_super_date_votes_target_id ON super_date_votes(target_id);
+CREATE INDEX IF NOT EXISTS idx_super_date_votes_created_at ON super_date_votes(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_super_date_matches_user1_id ON super_date_matches(user1_id);
+CREATE INDEX IF NOT EXISTS idx_super_date_matches_user2_id ON super_date_matches(user2_id);
 
 -- 트리거: updated_at 자동 업데이트
 CREATE OR REPLACE FUNCTION update_updated_at_column()
