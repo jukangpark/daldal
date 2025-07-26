@@ -67,8 +67,6 @@ export default function ProfilePage() {
   // 수퍼데이트 신청 관련 상태 (introductions 페이지에서 가져온 것)
   const [remainingRequests, setRemainingRequests] = useState<number>(2);
 
-  console.log("connectedPeople", connectedPeople);
-
   // 슈퍼 데이트 신청권 상태
   const [hasSuperDateTicket, setHasSuperDateTicket] = useState(false);
 
