@@ -283,7 +283,7 @@ export default function SuperDatePage() {
               <div className="flex items-center">
                 <span className="mr-3 w-2 h-2 bg-purple-500 rounded-full"></span>
                 <span className="text-gray-700 dark:text-gray-300">
-                  팝콘 먹으면 오늘 부터 1일
+                  팝콘 먹으면 오늘 부터 1일 ♥️
                 </span>
               </div>
               <div className="flex items-center">
@@ -326,7 +326,7 @@ export default function SuperDatePage() {
             className="flex justify-center items-center px-8 py-4 mx-auto font-medium text-white bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg transition-colors hover:from-pink-600 hover:to-purple-600"
           >
             <Heart className="mr-2 w-6 h-6" />
-            자기소개서 목록에서 수퍼데이트 신청하기
+            수퍼데이트 신청하기
             <ArrowRight className="ml-2 w-6 h-6" />
           </button>
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">

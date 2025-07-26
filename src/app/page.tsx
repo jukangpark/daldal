@@ -93,8 +93,8 @@ export default function HomePage() {
                     익명 투표 시스템
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    로그인한 상태에서 마음에 드는 상대에게 익명으로 투표할 수
-                    있습니다. 한 번에 한 명에게만 투표 가능하며, 중복 투표는
+                    자기소개서를 작성하고 마음에 드는 상대에게 익명으로 투표할
+                    수 있습니다. 2명에게만 투표 가능하며, 중복 투표는
                     불가합니다.
                   </p>
                 </div>
@@ -110,8 +110,7 @@ export default function HomePage() {
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
                     상대방도 나를 선택했을 때만 매칭이 성사됩니다. 매칭 성공 시
-                    내 프로필 페이지에 상대방 정보가 나타나고 슈퍼 데이트
-                    신청권이 발행됩니다.
+                    내 프로필 페이지에 상대방 정보가 나옵니다.
                   </p>
                 </div>
               </div>
@@ -125,9 +124,7 @@ export default function HomePage() {
                     필수 1:1 데이트
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    슈퍼 데이트 신청권을 사용하면 상대방과 무조건 1:1 데이트를
-                    해야 합니다. 만남 후 서로 평소대로 지내기를 원한다면, 다른
-                    사람에게 투표하면 신청권은 사라집니다.
+                    슈퍼 데이트 신청권으로 상호 매칭시 1:1 데이트 🎉
                   </p>
                 </div>
               </div>
@@ -140,11 +137,11 @@ export default function HomePage() {
               <ul className="space-y-3 text-gray-600 dark:text-gray-300">
                 <li className="flex items-center">
                   <div className="mr-3 w-2 h-2 rounded-full bg-primary-600"></div>
-                  로그인한 사용자만 투표 가능
+                  자기소개서 작성한 사용자에게만 투표 가능
                 </li>
                 <li className="flex items-center">
                   <div className="mr-3 w-2 h-2 rounded-full bg-primary-600"></div>
-                  한 번에 한 명에게만 투표 (중복 투표 불가)
+                  2명에게만 투표 가능 (중복 투표 불가)
                 </li>
                 <li className="flex items-center">
                   <div className="mr-3 w-2 h-2 rounded-full bg-primary-600"></div>
@@ -160,7 +157,7 @@ export default function HomePage() {
                 </li>
                 <li className="flex items-center">
                   <div className="mr-3 w-2 h-2 rounded-full bg-primary-600"></div>
-                  다른 사람 투표 시 기존 신청권 소멸
+                  신청 취소시 수퍼 데이트 신청권 회수
                 </li>
               </ul>
             </div>
@@ -379,8 +376,8 @@ export default function HomePage() {
                 익명 투표하기
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                마음에 드는 상대에게 익명으로 투표하세요. 한 번에 한 명에게만
-                투표할 수 있습니다
+                마음에 드는 상대에게 익명으로 투표하세요. 2명에게만 투표할 수
+                있습니다.
               </p>
             </div>
 

@@ -455,17 +455,21 @@ export default function ProfilePage() {
                   {selfIntro.title}
                 </h1>
 
-                <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-300">
+                <div className="flex items-center space-x-2 text-xs text-gray-600 md:space-x-6 md:text-sm dark:text-gray-300">
                   <div className="flex items-center">
-                    <User className="mr-2 w-4 h-4" />
-                    {selfIntro.user_name} ({selfIntro.user_age}세)
+                    <User className="mr-1 w-3 h-3 md:mr-2 md:w-4 md:h-4" />
+                    <span className="whitespace-nowrap">
+                      {selfIntro.user_name} ({selfIntro.user_age}세)
+                    </span>
                   </div>
                   <div className="flex items-center">
-                    <MapPin className="mr-2 w-4 h-4" />
-                    {selfIntro.user_location}
+                    <MapPin className="mr-1 w-3 h-3 md:mr-2 md:w-4 md:h-4" />
+                    <span className="whitespace-nowrap">
+                      {selfIntro.user_location}
+                    </span>
                   </div>
                   <span
-                    className={`px-3 py-1 text-xs rounded-full ${
+                    className={`px-2 md:px-3 py-1 text-xs rounded-full whitespace-nowrap ${
                       selfIntro.user_gender === "male"
                         ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                         : "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300"
