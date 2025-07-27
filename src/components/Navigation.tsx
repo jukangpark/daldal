@@ -17,6 +17,7 @@ import {
   Sun,
   Moon,
   Gamepad2,
+  Medal,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -82,9 +83,8 @@ const Navigation = () => {
   };
 
   const navItems = [
-    { href: "/", label: "Home", icon: Home },
-    { href: "/super-date", label: "수퍼 데이트 신청권", icon: Heart },
-    { href: "/introductions", label: "자기소개 목록", icon: FileText },
+    { href: "/super-date", label: "이벤트", icon: Heart },
+    { href: "/introductions", label: "자소설 목록", icon: FileText },
     { href: "/rules", label: "모임회칙", icon: BookOpen },
     {
       href: "/dadalgame",
@@ -96,6 +96,12 @@ const Navigation = () => {
       href: "/daldalChat",
       label: "달달톡",
       icon: MessageCircle,
+      requiresAuth: true,
+    },
+    {
+      href: "/honor",
+      label: "명예의 전당",
+      icon: Medal,
       requiresAuth: true,
     },
   ];

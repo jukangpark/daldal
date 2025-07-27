@@ -365,7 +365,9 @@ export default function RulesPage() {
             <div
               key={rule.id}
               className={`card ${
-                rule.important ? "border-l-4 border-l-red-500" : ""
+                rule.important
+                  ? "border-l-4 border-l-red-500 delay-200 animate-fade-in-up"
+                  : ""
               }`}
             >
               <div className="flex items-start space-x-4">

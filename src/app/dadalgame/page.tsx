@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Gamepad2, Heart, Users, Clock, Brain, Image, Zap } from "lucide-react";
+import {
+  Gamepad2,
+  Heart,
+  Users,
+  Clock,
+  Brain,
+  Image,
+  Zap,
+  Magnet,
+} from "lucide-react";
 
 interface GameItem {
   id: string;
@@ -57,6 +66,17 @@ const games: GameItem[] = [
     description: "당신의 반응 속도를 측정해보세요!",
     icon: Zap,
     href: "/dadalgame/reaction-speed",
+    difficulty: "쉬움",
+    players: "1명",
+    duration: "2분 이내",
+    isNew: true,
+  },
+  {
+    id: "tetotest",
+    title: "테토 vs 에겐 테스트",
+    description: "테토인가 에겐인가 그것이 문제로다",
+    icon: Magnet,
+    href: "/dadalgame/tetotest",
     difficulty: "쉬움",
     players: "1명",
     duration: "2분 이내",
@@ -170,7 +190,7 @@ export default function DaldalGame() {
                 <Link
                   key={game.id}
                   href={game.href}
-                  className="block p-6 bg-white rounded-lg shadow-md transition-all duration-200 group hover:shadow-lg dark:bg-gray-800 hover:scale-105"
+                  className="block p-6 bg-white rounded-lg shadow-md transition-all duration-200 delay-200 group hover:shadow-lg dark:bg-gray-800 hover:scale-105 animate-fade-in-up"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center space-x-3">
