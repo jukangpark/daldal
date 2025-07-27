@@ -734,9 +734,9 @@ export default function ProfilePage() {
       {/* 나를 선택한 이성 정보 */}
       <div className="mt-8">
         <div className="card">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              나를 선택한 이성 ({peopleWhoSelectedMe.length}명)
+          <div className="mb-6">
+            <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+              나를 선택한 이성 : {peopleWhoSelectedMe.length}명
             </h2>
             <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
               <HelpCircle className="mr-1 w-4 h-4" />
@@ -810,21 +810,15 @@ export default function ProfilePage() {
       {/* 연결된 이성 정보 */}
       <div className="mt-8">
         <div className="card">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-2">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              연결된 이성 ({connectedPeople.length}명)
+              🎉 연결된 이성 :{connectedPeople.length}명 🎉
             </h2>
-            {hasSuperDateTicket && connectedPeople.length > 0 && (
-              <button
-                onClick={() =>
-                  handleUseSuperDateTicket(connectedPeople[0].name)
-                }
-                className="flex items-center px-4 py-2 text-white rounded-lg transition-colors bg-primary-600 hover:bg-primary-700"
-              >
-                <Gift className="mr-2 w-4 h-4" />
-                슈퍼 데이트 신청권 사용하기
-              </button>
-            )}
+          </div>
+
+          <div className="flex items-center mb-6 text-sm text-gray-500 dark:text-gray-400">
+            <HelpCircle className="mr-1 w-4 h-4" />
+            <span>나를 선택했지만 아직 내가 선택하지 않은 사람들</span>
           </div>
 
           {loadingConnectedPeople ? (

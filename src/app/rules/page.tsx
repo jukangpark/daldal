@@ -290,12 +290,12 @@ export default function RulesPage() {
   });
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+    <div className="mx-auto max-w-4xl">
+      <div className="mb-12 text-center">
+        <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">
           모임회칙
         </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+        <p className="mx-auto max-w-2xl text-xl text-gray-600 dark:text-gray-300">
           달달 모임의 모든 회원이 지켜야 할 규칙들입니다
         </p>
       </div>
@@ -316,7 +316,7 @@ export default function RulesPage() {
                   : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
               }`}
             >
-              <BookOpen className="h-4 w-4" />
+              <BookOpen className="w-4 h-4" />
               <span>전체</span>
             </button>
             {Object.entries(categoryInfo).map(([key, info]) => {
@@ -331,7 +331,7 @@ export default function RulesPage() {
                       : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="w-4 h-4" />
                   <span>{info.label}</span>
                 </button>
               );
@@ -346,7 +346,7 @@ export default function RulesPage() {
               type="checkbox"
               checked={showImportantOnly}
               onChange={(e) => setShowImportantOnly(e.target.checked)}
-              className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 bg-white dark:bg-gray-800"
+              className="bg-white rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-800"
             />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               중요 규칙만 보기
@@ -370,29 +370,35 @@ export default function RulesPage() {
             >
               <div className="flex items-start space-x-4">
                 <div className={`flex-shrink-0 ${category.color}`}>
-                  <Icon className="h-6 w-6" />
+                  <Icon className="w-6 h-6" />
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <span className="text-sm font-bold text-primary-600">
-                      {rule.article}
-                    </span>
+                  {/* 제목과 조항 - 제목은 왼쪽, 조항은 오른쪽 */}
+                  <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {rule.title}
                     </h3>
+                    <span className="text-sm font-bold text-primary-600">
+                      {rule.article}
+                    </span>
+                  </div>
+
+                  {/* 뱃지들 - 모바일에서 세로로 배치 */}
+                  <div className="flex flex-wrap gap-2 items-center mb-3">
                     {rule.important && (
-                      <span className="flex items-center space-x-1 px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-xs rounded-full">
-                        <AlertCircle className="h-3 w-3" />
+                      <span className="flex items-center px-2 py-1 space-x-1 text-xs text-red-700 bg-red-100 rounded-full dark:bg-red-900/30 dark:text-red-300">
+                        <AlertCircle className="w-3 h-3" />
                         <span>중요</span>
                       </span>
                     )}
                     <span
-                      className={`text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300`}
+                      className={`px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300`}
                     >
                       {category.label}
                     </span>
                   </div>
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+
+                  <p className="leading-relaxed text-gray-600 dark:text-gray-300">
                     {rule.content}
                   </p>
                 </div>
@@ -403,17 +409,17 @@ export default function RulesPage() {
       </div>
 
       {filteredRules.length === 0 && (
-        <div className="text-center py-12">
-          <BookOpen className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400 text-lg">
+        <div className="py-12 text-center">
+          <BookOpen className="mx-auto mb-4 w-12 h-12 text-gray-300 dark:text-gray-600" />
+          <p className="text-lg text-gray-500 dark:text-gray-400">
             선택한 조건에 맞는 회칙이 없습니다.
           </p>
         </div>
       )}
 
       {/* 회칙 개정 이력 */}
-      <div className="mt-12 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="p-6 mt-12 bg-gray-50 rounded-lg dark:bg-gray-800">
+        <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
           회칙 개정 이력
         </h3>
         <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
@@ -434,17 +440,17 @@ export default function RulesPage() {
       </div>
 
       {/* 회칙 동의 섹션 */}
-      <div className="mt-8 p-6 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
+      <div className="p-6 mt-8 rounded-lg bg-primary-50 dark:bg-primary-900/20">
         <div className="text-center">
-          <CheckCircle className="h-12 w-12 text-primary-600 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          <CheckCircle className="mx-auto mb-4 w-12 h-12 text-primary-600" />
+          <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
             회칙 동의
           </h3>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">
+          <p className="mb-4 text-gray-600 dark:text-gray-300">
             달달 모임에 가입하시면 위의 모든 회칙에 동의하는 것으로 간주됩니다.
           </p>
-          <div className="flex items-center justify-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-            <Clock className="h-4 w-4" />
+          <div className="flex justify-center items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+            <Clock className="w-4 h-4" />
             <span>최종 업데이트: 2025년 7월 8일</span>
           </div>
         </div>
