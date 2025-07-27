@@ -300,7 +300,7 @@ export default function WriteIntroductionPage() {
               required
             />
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-300">
-              최소 30자 이상 작성해주세요. ({formData.content.length}자)
+              작성된 글자 수: {formData.content.length}자
             </p>
           </div>
         </div>
@@ -540,7 +540,7 @@ export default function WriteIntroductionPage() {
           </button>
           <button
             type="submit"
-            disabled={isSubmitting || formData.content.length < 30}
+            disabled={isSubmitting}
             className="flex items-center px-6 py-3 text-white rounded-lg transition-colors bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
