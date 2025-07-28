@@ -1,20 +1,116 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import {
   Heart,
   Trophy,
   ArrowLeft,
-  Construction,
-  Clock,
   Users,
   Star,
+  Crown,
+  User,
+  CheckCircle,
+  XCircle,
+  Loader2,
+  Calendar,
+  Award,
+  Flame,
+  Sparkles,
+  HeartHandshake,
+  Palette,
 } from "lucide-react";
+import {
+  honorVoteAPI,
+  VoteCandidate,
+  HonorVote,
+  HonorResult,
+} from "@/lib/supabase";
+
+type VoteCategory =
+  | "hot_girl"
+  | "hot_boy"
+  | "manner"
+  | "sexy"
+  | "cute"
+  | "style";
+
+interface CategoryInfo {
+  id: VoteCategory;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  gender?: "male" | "female";
+}
+
+const CATEGORIES: CategoryInfo[] = [
+  {
+    id: "hot_girl",
+    title: "핫 걸 TOP3",
+    description: "가장 매력적인 여성에게 투표하세요",
+    icon: <Flame className="w-6 h-6" />,
+    color: "text-pink-500",
+    gender: "female",
+  },
+  {
+    id: "hot_boy",
+    title: "핫 보이 TOP3",
+    description: "가장 매력적인 남성에게 투표하세요",
+    icon: <Flame className="w-6 h-6" />,
+    color: "text-blue-500",
+    gender: "male",
+  },
+  {
+    id: "manner",
+    title: "매너 TOP3",
+    description: "가장 예의 바른 사람에게 투표하세요",
+    icon: <HeartHandshake className="w-6 h-6" />,
+    color: "text-green-500",
+  },
+  {
+    id: "sexy",
+    title: "섹시 TOP3",
+    description: "가장 섹시한 사람에게 투표하세요",
+    icon: <Sparkles className="w-6 h-6" />,
+    color: "text-purple-500",
+  },
+  {
+    id: "cute",
+    title: "귀요미 TOP3",
+    description: "가장 귀여운 사람에게 투표하세요",
+    icon: <Heart className="w-6 h-6" />,
+    color: "text-red-500",
+  },
+  {
+    id: "style",
+    title: "스타일 TOP3",
+    description: "가장 스타일리시한 사람에게 투표하세요",
+    icon: <Palette className="w-6 h-6" />,
+    color: "text-yellow-500",
+  },
+];
 
 export default function HonorVotePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+
+  // 상태 관리
+  const [candidates, setCandidates] = useState<VoteCandidate[]>([]);
+  const [userVotes, setUserVotes] = useState<HonorVote[]>([]);
+  const [results, setResults] = useState<HonorResult[]>([]);
+  const [loadingCandidates, setLoadingCandidates] = useState(true);
+  const [loadingVotes, setLoadingVotes] = useState(true);
+  const [loadingResults, setLoadingResults] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<VoteCategory | null>(
+    null
+  );
+  const [voting, setVoting] = useState(false);
+
+  // 현재 월-년 계산
+  const currentMonthYear = new Date().toISOString().slice(0, 7); // '2024-12' 형식
 
   // 로그인하지 않은 경우 홈으로 리다이렉트
   if (!loading && !user) {
@@ -22,7 +118,132 @@ export default function HonorVotePage() {
     return null;
   }
 
-  if (loading) {
+  // 데이터 로드
+  useEffect(() => {
+    if (user) {
+      loadCandidates();
+      loadUserVotes();
+      loadResults();
+    }
+  }, [user]);
+
+  const loadCandidates = async () => {
+    try {
+      setLoadingCandidates(true);
+      const { data, error } = await honorVoteAPI.getCandidates();
+      if (error) {
+        console.error("후보자 로드 오류:", error);
+        setError("투표 후보자를 불러오는 중 오류가 발생했습니다.");
+      } else {
+        setCandidates(data || []);
+      }
+    } catch (err) {
+      console.error("후보자 로드 오류:", err);
+      setError("투표 후보자를 불러오는 중 오류가 발생했습니다.");
+    } finally {
+      setLoadingCandidates(false);
+    }
+  };
+
+  const loadUserVotes = async () => {
+    try {
+      setLoadingVotes(true);
+      const { data, error } = await honorVoteAPI.getUserVotes(currentMonthYear);
+      if (error) {
+        console.error("투표 내역 로드 오류:", error);
+      } else {
+        setUserVotes(data || []);
+      }
+    } catch (err) {
+      console.error("투표 내역 로드 오류:", err);
+    } finally {
+      setLoadingVotes(false);
+    }
+  };
+
+  const loadResults = async () => {
+    try {
+      setLoadingResults(true);
+      const { data, error } = await honorVoteAPI.getLiveResults();
+      if (error) {
+        console.error("결과 로드 오류:", error);
+      } else {
+        setResults(data || []);
+      }
+    } catch (err) {
+      console.error("결과 로드 오류:", err);
+    } finally {
+      setLoadingResults(false);
+    }
+  };
+
+  const handleVote = async (targetId: string, category: VoteCategory) => {
+    try {
+      setVoting(true);
+      const { data, error } = await honorVoteAPI.vote({
+        target_id: targetId,
+        category,
+        month_year: currentMonthYear,
+      });
+
+      if (error) {
+        console.error("투표 오류:", error);
+        alert(error.message || "투표 중 오류가 발생했습니다.");
+      } else {
+        alert("투표가 완료되었습니다!");
+        loadUserVotes(); // 투표 내역 새로고침
+        loadResults(); // 결과 새로고침
+      }
+    } catch (err: any) {
+      console.error("투표 오류:", err);
+      alert(err.message || "투표 중 오류가 발생했습니다.");
+    } finally {
+      setVoting(false);
+    }
+  };
+
+  const handleCancelVote = async (category: VoteCategory) => {
+    try {
+      const { error } = await honorVoteAPI.cancelVote(
+        category,
+        currentMonthYear
+      );
+      if (error) {
+        console.error("투표 취소 오류:", error);
+        alert("투표 취소 중 오류가 발생했습니다.");
+      } else {
+        alert("투표가 취소되었습니다.");
+        loadUserVotes();
+        loadResults();
+      }
+    } catch (err) {
+      console.error("투표 취소 오류:", err);
+      alert("투표 취소 중 오류가 발생했습니다.");
+    }
+  };
+
+  const getFilteredCandidates = (category: VoteCategory) => {
+    const categoryInfo = CATEGORIES.find((c) => c.id === category);
+
+    if (categoryInfo?.gender) {
+      return candidates.filter((c) => c.user_gender === categoryInfo.gender);
+    }
+    return candidates;
+  };
+
+  const getUserVoteForCategory = (category: VoteCategory) => {
+    return userVotes.find((vote) => vote.category === category);
+  };
+
+  const getResultsForCategory = (category: VoteCategory) => {
+    return results.filter((result) => result.category === category);
+  };
+
+  const getVotedCandidate = (targetId: string) => {
+    return candidates.find((c) => c.user_id === targetId);
+  };
+
+  if (loading || loadingCandidates || loadingVotes || loadingResults) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
@@ -36,8 +257,26 @@ export default function HonorVotePage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="p-6 mx-auto max-w-4xl">
+        <div className="text-center">
+          <XCircle className="mx-auto mb-4 w-16 h-16 text-red-500" />
+          <h2 className="mb-4 text-2xl font-bold text-red-600">오류 발생</h2>
+          <p className="mb-6 text-gray-600 dark:text-gray-300">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 text-white rounded-lg transition-colors bg-primary-600 hover:bg-primary-700"
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="p-6 mx-auto max-w-6xl">
       {/* 헤더 */}
       <div className="mb-8">
         <button
@@ -49,166 +288,166 @@ export default function HonorVotePage() {
         </button>
 
         <div className="text-center">
-          <div className="flex justify-center items-center mb-4 animate-fade-in-up">
-            <Heart className="mr-3 w-12 h-12 text-primary-600" />
+          <div className="flex justify-center items-center mb-4">
+            <Trophy className="mr-3 w-12 h-12 text-primary-600" />
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
               익명 투표
             </h1>
           </div>
-          <p className="text-xl text-gray-600 delay-200 dark:text-gray-300 animate-fade-in-up">
+          <p className="text-xl text-gray-600 dark:text-gray-300">
             이번 달 가장 인상 깊었던 회원에게 투표해주세요
           </p>
-        </div>
-      </div>
-
-      {/* 개발중 알림 */}
-      <div className="p-8 mb-8 bg-yellow-50 rounded-lg border border-yellow-200 delay-300 dark:bg-yellow-900/20 dark:border-yellow-700 animate-fade-in-up">
-        <div className="text-center">
-          <Construction className="mx-auto mb-4 w-16 h-16 text-yellow-600 dark:text-yellow-400" />
-          <h2 className="mb-4 text-2xl font-bold text-yellow-800 dark:text-yellow-200">
-            🚧 투표 시스템 개발중 🚧
-          </h2>
-          <p className="mb-6 text-lg text-yellow-700 dark:text-yellow-300">
-            더 나은 투표 경험을 위해 열심히 개발하고 있습니다.
-            <br />곧 만나뵙겠습니다!
-          </p>
-
-          {/* 개발 진행 상황 */}
-          <div className="grid gap-6 mt-8 md:grid-cols-3 delay-400 animate-fade-in-up">
-            <div className="p-4 bg-white rounded-lg border border-yellow-200 dark:bg-gray-800 dark:border-yellow-700">
-              <div className="flex justify-center items-center mb-3">
-                <Users className="w-8 h-8 text-blue-500" />
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-                회원 목록
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                투표 대상 회원 목록 구성
-              </p>
-              <div className="mt-3 w-full h-2 bg-gray-200 rounded-full dark:bg-gray-700">
-                <div
-                  className="h-2 bg-green-500 rounded-full"
-                  style={{ width: "90%" }}
-                ></div>
-              </div>
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                90% 완료
-              </span>
-            </div>
-
-            <div className="p-4 bg-white rounded-lg border border-yellow-200 dark:bg-gray-800 dark:border-yellow-700">
-              <div className="flex justify-center items-center mb-3">
-                <Heart className="w-8 h-8 text-red-500" />
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-                투표 시스템
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                익명 투표 기능 구현
-              </p>
-              <div className="mt-3 w-full h-2 bg-gray-200 rounded-full dark:bg-gray-700">
-                <div
-                  className="h-2 bg-yellow-500 rounded-full"
-                  style={{ width: "60%" }}
-                ></div>
-              </div>
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                60% 완료
-              </span>
-            </div>
-
-            <div className="p-4 bg-white rounded-lg border border-yellow-200 dark:bg-gray-800 dark:border-yellow-700">
-              <div className="flex justify-center items-center mb-3">
-                <Trophy className="w-8 h-8 text-yellow-500" />
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-                결과 집계
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                투표 결과 계산 및 표시
-              </p>
-              <div className="mt-3 w-full h-2 bg-gray-200 rounded-full dark:bg-gray-700">
-                <div
-                  className="h-2 bg-blue-500 rounded-full"
-                  style={{ width: "40%" }}
-                ></div>
-              </div>
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                40% 완료
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 예상 기능 소개 */}
-      <div className="p-6 rounded-lg delay-500 bg-primary-50 dark:bg-primary-900/20 animate-fade-in-up">
-        <div className="text-center">
-          <Star className="mx-auto mb-4 w-12 h-12 text-primary-600" />
-          <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-            🎯 투표 기능
-          </h3>
-          <div className="grid gap-4 text-left md:grid-cols-2">
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-gray-700 dark:text-gray-300">
-                  완전 익명 투표
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-gray-700 dark:text-gray-300">
-                  카테고리별 투표
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-gray-700 dark:text-gray-300">
-                  실시간 결과 확인
-                </span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <span className="text-gray-700 dark:text-gray-300">
-                  월 1회 투표 기회
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <span className="text-gray-700 dark:text-gray-300">
-                  투표 이력 관리
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <span className="text-gray-700 dark:text-gray-300">
-                  공정한 집계 시스템
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 예상 출시일 */}
-      <div className="p-6 mt-8 bg-gray-50 rounded-lg dark:bg-gray-800 delay-600 animate-fade-in-up">
-        <div className="text-center">
-          <Clock className="mx-auto mb-4 w-12 h-12 text-gray-600 dark:text-gray-400" />
-          <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-            예상 출시일
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300">2025년 8월 초 예정</p>
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            정확한 출시일은 추후 공지됩니다.
+            각 카테고리당 1명에게만 투표할 수 있습니다
           </p>
         </div>
+      </div>
+
+      <div className="space-y-8">
+        {loadingCandidates ? (
+          <div className="py-12 text-center">
+            <Loader2 className="mx-auto mb-4 w-8 h-8 animate-spin text-primary-600" />
+            <p className="text-gray-600 dark:text-gray-400">
+              투표 후보자를 불러오는 중...
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {CATEGORIES.map((category) => {
+              const filteredCandidates = getFilteredCandidates(category.id);
+              const userVote = getUserVoteForCategory(category.id);
+              const votedCandidate = userVote
+                ? getVotedCandidate(userVote.target_id)
+                : null;
+
+              return (
+                <div key={category.id} className="card">
+                  <div className="flex items-center mb-4">
+                    <div className={`p-2 rounded-lg mr-3 ${category.color}`}>
+                      {category.icon}
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {category.title}
+                    </h3>
+                  </div>
+
+                  <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                    {category.description}
+                  </p>
+
+                  {userVote ? (
+                    /* 이미 투표한 경우 */
+                    <div className="space-y-4">
+                      <div className="p-4 bg-green-50 rounded-lg border border-green-200 dark:bg-green-900/20 dark:border-green-700">
+                        <div className="flex items-center mb-2">
+                          <CheckCircle className="mr-2 w-5 h-5 text-green-600" />
+                          <span className="font-medium text-green-800 dark:text-green-200">
+                            투표 완료
+                          </span>
+                        </div>
+                        {votedCandidate && (
+                          <div className="flex items-center">
+                            <div className="overflow-hidden mr-3 w-12 h-12 bg-gray-200 rounded-full dark:bg-gray-700">
+                              {votedCandidate.profile_image ? (
+                                <img
+                                  src={votedCandidate.profile_image}
+                                  alt={votedCandidate.user_name}
+                                  className="object-cover w-full h-full"
+                                />
+                              ) : (
+                                <User className="p-2 w-full h-full text-gray-400" />
+                              )}
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900 dark:text-white">
+                                {votedCandidate.user_name}
+                              </p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                {votedCandidate.user_gender === "male"
+                                  ? "남성"
+                                  : "여성"}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleCancelVote(category.id)}
+                        disabled={voting}
+                        className="px-4 py-2 w-full text-sm text-red-600 rounded-lg border border-red-300 transition-colors hover:bg-red-50 dark:text-red-400 dark:border-red-600 dark:hover:bg-red-900/20 disabled:opacity-50"
+                      >
+                        {voting ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          "투표 취소"
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    /* 투표하지 않은 경우 */
+                    <div className="space-y-3">
+                      {filteredCandidates.length > 0 ? (
+                        filteredCandidates.map((candidate) => (
+                          <button
+                            key={candidate.user_id}
+                            onClick={() =>
+                              handleVote(candidate.user_id, category.id)
+                            }
+                            disabled={voting || candidate.user_id === user?.id}
+                            className="p-3 w-full text-left rounded-lg border border-gray-200 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <div className="flex items-center">
+                              <div className="overflow-hidden mr-3 w-10 h-10 bg-gray-200 rounded-full dark:bg-gray-700">
+                                {candidate.profile_image ? (
+                                  <img
+                                    src={candidate.profile_image}
+                                    alt={candidate.user_name}
+                                    className="object-cover w-full h-full"
+                                  />
+                                ) : (
+                                  <User className="p-2 w-full h-full text-gray-400" />
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-medium text-gray-900 dark:text-white">
+                                  {candidate.user_name}
+                                  {candidate.user_id === user?.id && (
+                                    <span className="ml-2 text-xs text-gray-500">
+                                      (나)
+                                    </span>
+                                  )}
+                                </p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                  {candidate.user_gender === "male"
+                                    ? "남성"
+                                    : "여성"}
+                                </p>
+                              </div>
+                              {candidate.user_id === user?.id && (
+                                <XCircle className="w-5 h-5 text-gray-400" />
+                              )}
+                            </div>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="py-6 text-center">
+                          <Users className="mx-auto mb-2 w-8 h-8 text-gray-400" />
+                          <p className="text-gray-500 dark:text-gray-400">
+                            해당 카테고리의 후보자가 없습니다
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* 돌아가기 버튼 */}
-      <div className="mt-8 text-center delay-700 animate-fade-in-up">
+      <div className="mt-12 text-center">
         <button
           onClick={() => router.push("/honor")}
           className="flex items-center px-6 py-3 mx-auto text-gray-700 bg-gray-100 rounded-lg transition-colors dark:text-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"

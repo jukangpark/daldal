@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Menu,
   X,
@@ -31,6 +31,7 @@ const Navigation = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   // 로딩 중일 때는 인증 버튼만 스켈레톤으로 처리
   const renderAuthButtons = () => {
@@ -102,7 +103,7 @@ const Navigation = () => {
       href: "/honor",
       label: "명예의 전당",
       icon: Medal,
-      requiresAuth: true,
+      requiresAuth: false,
     },
   ];
 
@@ -123,6 +124,8 @@ const Navigation = () => {
         alert("로그아웃 중 오류가 발생했습니다.");
       } else {
         alert("로그아웃되었습니다.");
+        // 홈페이지로 리다이렉트
+        router.push("/");
       }
     } catch (error) {
       console.error("Logout error:", error);
