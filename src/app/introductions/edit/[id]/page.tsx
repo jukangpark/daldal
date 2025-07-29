@@ -27,6 +27,7 @@ export default function EditIntroductionPage() {
     age: "",
     gender: "",
     location: "",
+    user_name: "",
     photos: [] as string[],
     ideal_physical_type: "",
     ideal_personality_type: "",
@@ -83,6 +84,7 @@ export default function EditIntroductionPage() {
           age: data.user_age?.toString() || "",
           gender: data.user_gender || "",
           location: data.user_location || "",
+          user_name: data.user_name || "",
           photos: data.photos || [],
           ideal_physical_type: data.ideal_physical_type || "",
           ideal_personality_type: data.ideal_personality_type || "",
@@ -197,7 +199,8 @@ export default function EditIntroductionPage() {
 
       const updateData = {
         user_id: user!.id,
-        user_name: user?.user_metadata?.name || user?.email || "",
+        user_name:
+          formData.user_name || user?.user_metadata?.name || user?.email || "",
         user_age: parseInt(formData.age),
         user_gender: formData.gender as "male" | "female",
         user_location: formData.location,
@@ -309,6 +312,21 @@ export default function EditIntroductionPage() {
                 value={formData.title}
                 onChange={handleInputChange}
                 placeholder="당신을 나타내는 제목을 작성해주세요"
+                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                이름 *
+              </label>
+              <input
+                type="text"
+                name="user_name"
+                value={formData.user_name}
+                onChange={handleInputChange}
+                placeholder="이름을 입력해주세요"
                 className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 required
               />

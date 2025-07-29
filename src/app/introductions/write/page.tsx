@@ -28,6 +28,7 @@ export default function WriteIntroductionPage() {
     age: "",
     gender: "",
     location: "",
+    user_name: "",
     photos: [] as string[],
     ideal_physical_type: "",
     ideal_personality_type: "",
@@ -137,7 +138,8 @@ export default function WriteIntroductionPage() {
       // 새로 작성 모드: create API 호출
       const { data, error } = await selfIntroductionAPI.create({
         user_id: user!.id,
-        user_name: user?.user_metadata?.name || user?.email || "",
+        user_name:
+          formData.user_name || user?.user_metadata?.name || user?.email || "",
         user_age: parseInt(formData.age),
         user_gender: formData.gender as "male" | "female",
         user_location: formData.location,
@@ -220,6 +222,21 @@ export default function WriteIntroductionPage() {
                 value={formData.title}
                 onChange={handleInputChange}
                 placeholder="당신을 나타내는 제목을 작성해주세요"
+                className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                이름 *
+              </label>
+              <input
+                type="text"
+                name="user_name"
+                value={formData.user_name}
+                onChange={handleInputChange}
+                placeholder="이름을 입력해주세요"
                 className="px-3 py-2 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 required
               />

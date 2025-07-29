@@ -44,6 +44,8 @@ export default function IntroductionsPage() {
   );
   const [remainingRequests, setRemainingRequests] = useState<number>(2);
   const [matches, setMatches] = useState<any[]>([]);
+  const [hasExistingIntroduction, setHasExistingIntroduction] =
+    useState<boolean>(false);
 
   // 자기소개서 데이터 로드
   useEffect(() => {
@@ -56,6 +58,14 @@ export default function IntroductionsPage() {
           setError("자기소개서를 불러오는 중 오류가 발생했습니다.");
         } else {
           setIntroductions(data || []);
+
+          // 현재 사용자가 이미 자기소개서를 작성했는지 확인
+          if (user && data) {
+            const existingIntro = data.find(
+              (intro) => intro.user_id === user.id
+            );
+            setHasExistingIntroduction(!!existingIntro);
+          }
         }
       } catch (err) {
         console.error("자기소개서 로드 오류:", err);
@@ -66,7 +76,7 @@ export default function IntroductionsPage() {
     };
 
     loadIntroductions();
-  }, []);
+  }, [user]);
 
   // 사용자가 보낸 수퍼데이트 신청 로드
   useEffect(() => {
@@ -300,13 +310,23 @@ export default function IntroductionsPage() {
         {/* 자기소개서 작성하기 버튼 */}
         <div className="mt-8">
           {user ? (
-            <button
-              onClick={() => router.push("/introductions/write")}
-              className="inline-flex items-center px-6 py-3 font-medium text-white rounded-lg shadow-lg transition-colors duration-200 bg-primary-600 hover:bg-primary-700 hover:shadow-xl"
-            >
-              <Plus className="mr-2 w-5 h-5" />
-              자기소개서 작성하기
-            </button>
+            hasExistingIntroduction ? (
+              <button
+                disabled
+                className="inline-flex items-center px-6 py-3 font-medium text-gray-400 bg-gray-200 rounded-lg shadow-lg cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"
+              >
+                <Plus className="mr-2 w-5 h-5" />
+                이미 작성된 자기소개서가 있습니다
+              </button>
+            ) : (
+              <button
+                onClick={() => router.push("/introductions/write")}
+                className="inline-flex items-center px-6 py-3 font-medium text-white rounded-lg shadow-lg transition-colors duration-200 bg-primary-600 hover:bg-primary-700 hover:shadow-xl"
+              >
+                <Plus className="mr-2 w-5 h-5" />
+                자기소개서 작성하기
+              </button>
+            )
           ) : (
             <button
               onClick={() => setShowLoginModal(true)}
