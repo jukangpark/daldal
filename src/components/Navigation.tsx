@@ -27,6 +27,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
+import Image from "next/image";
 
 const Navigation = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -154,7 +155,13 @@ const Navigation = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex flex-shrink-0 items-center">
-              <Heart className="w-8 h-8 text-primary-600" />
+              <Image
+                src="/icon.svg"
+                alt="달달"
+                width={32}
+                height={32}
+                className="w-8 h-8 text-primary-600"
+              />
               <span className="ml-2 text-xl font-bold text-gray-900 truncate dark:text-white">
                 달달
               </span>
