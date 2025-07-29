@@ -21,6 +21,7 @@ import {
   ChevronDown,
   Users,
   Camera,
+  Trophy,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -100,7 +101,7 @@ const Navigation = () => {
     {
       href: "/honor",
       label: "명예의 전당",
-      icon: Medal,
+      icon: Trophy,
       requiresAuth: false,
     },
   ];
