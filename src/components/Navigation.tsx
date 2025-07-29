@@ -18,6 +18,9 @@ import {
   Moon,
   Gamepad2,
   Medal,
+  ChevronDown,
+  Users,
+  Camera,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -30,6 +33,7 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showCommunityDropdown, setShowCommunityDropdown] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -94,15 +98,24 @@ const Navigation = () => {
       requiresAuth: true,
     },
     {
+      href: "/honor",
+      label: "명예의 전당",
+      icon: Medal,
+      requiresAuth: false,
+    },
+  ];
+
+  const communityItems = [
+    {
       href: "/daldalChat",
       label: "달달톡",
       icon: MessageCircle,
       requiresAuth: true,
     },
     {
-      href: "/honor",
-      label: "명예의 전당",
-      icon: Medal,
+      href: "/daldalstagram",
+      label: "달달스타그램",
+      icon: Camera,
       requiresAuth: false,
     },
   ];
@@ -168,6 +181,49 @@ const Navigation = () => {
                 </Link>
               );
             })}
+
+            {/* 달달 커뮤니티 드롭다운 */}
+            <div className="relative">
+              <button
+                onClick={() => setShowCommunityDropdown(!showCommunityDropdown)}
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  pathname.startsWith("/daldalChat") ||
+                  pathname.startsWith("/daldalstagram")
+                    ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20"
+                    : "text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                }`}
+              >
+                <Users className="w-4 h-4 lg:mr-2" />
+                <span className="hidden lg:inline">커뮤니티</span>
+                <ChevronDown className="ml-1 w-4 h-4" />
+              </button>
+
+              {showCommunityDropdown && (
+                <div className="absolute left-0 top-full z-50 mt-1 w-48 bg-white rounded-md border border-gray-200 shadow-lg dark:bg-gray-800 dark:border-gray-700">
+                  {communityItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={(e) => {
+                          handleNavItemClick(item, e);
+                          setShowCommunityDropdown(false);
+                        }}
+                        className={`flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
+                          isActive(item.href)
+                            ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20"
+                            : "text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        <Icon className="mr-3 w-4 h-4" />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
             {/* Theme Toggle */}
             <button
@@ -246,6 +302,35 @@ const Navigation = () => {
                     handleNavItemClick(item, e);
                   }}
                   className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                    isActive(item.href)
+                      ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20"
+                      : "text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  <Icon className="mr-3 w-5 h-5" />
+                  {item.label}
+                </Link>
+              );
+            })}
+
+            {/* 달달 커뮤니티 섹션 */}
+            <div className="px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300">
+              <div className="flex items-center">
+                <Users className="mr-3 w-5 h-5" />
+                커뮤니티
+              </div>
+            </div>
+            {communityItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={(e) => {
+                    handleNavItemClick(item, e);
+                    setIsOpen(false);
+                  }}
+                  className={`flex items-center px-6 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
                     isActive(item.href)
                       ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20"
                       : "text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"

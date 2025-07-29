@@ -11,8 +11,7 @@ interface AuthContextType {
   signUp: (
     email: string,
     password: string,
-    name: string,
-    phone: string
+    name: string
   ) => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
 }
@@ -64,13 +63,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return { error };
   };
 
-  const signUp = async (
-    email: string,
-    password: string,
-    name: string,
-    phone: string
-  ) => {
-    const { error } = await auth.signUp({ email, password, name, phone });
+  const signUp = async (email: string, password: string, name: string) => {
+    const { error } = await auth.signUp({ email, password, name });
     return { error };
   };
 
