@@ -173,7 +173,7 @@ export const auth = {
         data: {
           name,
         },
-        emailRedirectTo: `${window.location.origin}`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
     return { data, error };
