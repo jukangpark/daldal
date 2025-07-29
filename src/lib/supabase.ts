@@ -173,7 +173,7 @@ export const auth = {
         data: {
           name,
         },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: process.env.NEXT_PUBLIC_AUTH_CALLBACK_URL,
       },
     });
     return { data, error };
