@@ -7,8 +7,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
-  title: "달달 - 수퍼 데이트 플랫폼",
-  description: "진정한 만남을 위한 수퍼 데이트 신청권 플랫폼",
+  title: "달달 - 슈퍼 데이트 플랫폼",
+  description: "진정한 만남을 위한 슈퍼 데이트 신청권 플랫폼",
 };
 
 export default function RootLayout({

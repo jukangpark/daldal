@@ -51,7 +51,7 @@ export default function HomePage() {
 
           <div className="delay-300 animate-fade-in-up">
             <p className="mx-auto mb-8 max-w-2xl text-xl text-gray-600 dark:text-gray-300">
-              달달에서 특별한 수퍼 데이트 신청권을 통해 더 깊이 있는 만남을
+              달달에서 특별한 슈퍼 데이트 신청권을 통해 더 깊이 있는 만남을
               경험해보세요
             </p>
           </div>
@@ -61,7 +61,7 @@ export default function HomePage() {
               href="/super-date"
               className="inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 rounded-full shadow-lg transition-all duration-300 transform group hover:shadow-xl hover:scale-105 animate-bounce-subtle"
             >
-              수퍼 데이트 신청하기
+              슈퍼 데이트 신청하기
               <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
             <Link
@@ -157,7 +157,7 @@ export default function HomePage() {
                 </li>
                 <li className="flex items-center">
                   <div className="mr-3 w-2 h-2 rounded-full bg-primary-600"></div>
-                  신청 취소시 수퍼 데이트 신청권 회수
+                  신청 취소시 슈퍼 데이트 신청권 회수
                 </li>
               </ul>
             </div>

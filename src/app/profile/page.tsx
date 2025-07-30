@@ -64,7 +64,7 @@ export default function ProfilePage() {
 
   const [loadingConnectedPeople, setLoadingConnectedPeople] = useState(true);
 
-  // 수퍼데이트 신청 관련 상태 (introductions 페이지에서 가져온 것)
+  // 슈퍼 데이트 신청 관련 상태 (introductions 페이지에서 가져온 것)
   const [remainingRequests, setRemainingRequests] = useState<number>(2);
 
   // 슈퍼 데이트 신청권 상태
@@ -176,7 +176,7 @@ export default function ProfilePage() {
             location: "비공개", // 지역 숨김
             photo: "/default-avatar.png", // 기본 아바타
             introduction:
-              "이 사람이 나를 선택했습니다. 수퍼데이트 신청을 통해 서로를 알아갈 수 있습니다.", // 기본 메시지
+              "이 사람이 나를 선택했습니다. 슈퍼 데이트 신청을 통해 서로를 알아갈 수 있습니다.", // 기본 메시지
             created_at: receivedRequest.created_at,
             introduction_id: "", // 자기소개서 ID 숨김
           });
@@ -191,7 +191,7 @@ export default function ProfilePage() {
     }
   };
 
-  // 수퍼데이트 신청하기
+  // 슈퍼 데이트 신청하기
   const handleSuperDateRequest = async (
     targetId: string,
     targetName: string
@@ -202,14 +202,14 @@ export default function ProfilePage() {
     }
 
     if (targetId === user.id) {
-      alert("자신에게는 수퍼데이트를 신청할 수 없습니다.");
+      alert("자신에게는 슈퍼 데이트를 신청할 수 없습니다.");
       return;
     }
 
     // 신청 개수 제한 확인 (2개)
     if (remainingRequests <= 0) {
       alert(
-        "수퍼데이트 신청은 하루에 2개까지만 가능합니다. 기존 신청을 취소하고 다시 시도해주세요."
+        "슈퍼 데이트 신청은 하루에 2개까지만 가능합니다. 기존 신청을 취소하고 다시 시도해주세요."
       );
       return;
     }
@@ -221,18 +221,18 @@ export default function ProfilePage() {
       });
 
       if (error) {
-        console.error("수퍼데이트 신청 오류:", error);
-        alert("수퍼데이트 신청에 실패했습니다.");
+        console.error("슈퍼 데이트 신청 오류:", error);
+        alert("슈퍼 데이트 신청에 실패했습니다.");
       } else {
         setRemainingRequests((prev) => Math.max(0, prev - 1));
-        alert("수퍼데이트 신청이 완료되었습니다!");
+        alert("슈퍼 데이트 신청이 완료되었습니다!");
         // 데이터 새로고침
         loadPeopleWhoSelectedMe();
         loadConnectedPeople();
       }
     } catch (err) {
-      console.error("수퍼데이트 신청 오류:", err);
-      alert("수퍼데이트 신청에 실패했습니다.");
+      console.error("슈퍼 데이트 신청 오류:", err);
+      alert("슈퍼 데이트 신청에 실패했습니다.");
     }
   };
 
@@ -919,7 +919,7 @@ export default function ProfilePage() {
                 현재 나와 연결된 이성이 없습니다
               </p>
               <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">
-                자기소개서 목록에서 마음에 드는 상대에게 수퍼데이트를
+                자기소개서 목록에서 마음에 드는 상대에게 슈퍼 데이트를
                 신청해보세요
               </p>
               <div className="mt-4">

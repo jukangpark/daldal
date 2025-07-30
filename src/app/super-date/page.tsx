@@ -71,7 +71,7 @@ export default function SuperDatePage() {
     }
 
     if (remainingRequests <= 0) {
-      alert("수퍼데이트 신청은 하루에 2개까지만 가능합니다.");
+      alert("슈퍼 데이트 신청은 하루에 2개까지만 가능합니다.");
       return;
     }
 
@@ -85,19 +85,19 @@ export default function SuperDatePage() {
       });
 
       if (error) {
-        console.error("수퍼데이트 신청 오류:", error);
-        alert("수퍼데이트 신청 중 오류가 발생했습니다.");
+        console.error("슈퍼 데이트 신청 오류:", error);
+        alert("슈퍼 데이트 신청 중 오류가 발생했습니다.");
       } else {
         setRemainingRequests((prev) => Math.max(0, prev - 1));
         alert(
-          "수퍼데이트 신청이 완료되었습니다! CGV 기프티콘 이벤트에 참여하세요!"
+          "슈퍼 데이트 신청이 완료되었습니다! CGV 기프티콘 이벤트에 참여하세요!"
         );
         setSelectedUser(null);
         setMessage("");
       }
     } catch (error) {
-      console.error("수퍼데이트 신청 오류:", error);
-      alert("수퍼데이트 신청 중 오류가 발생했습니다.");
+      console.error("슈퍼 데이트 신청 오류:", error);
+      alert("슈퍼 데이트 신청 중 오류가 발생했습니다.");
     } finally {
       setSubmitting(false);
     }
@@ -152,12 +152,10 @@ export default function SuperDatePage() {
       >
         <div className="flex justify-center items-center mb-4">
           <Gift
-            className={`mr-3 w-12 h-12 text-pink-500 transition-all duration-1000 delay-300 ${
-              animateIn ? "scale-110 rotate-12" : "scale-100 rotate-0"
-            }`}
+            className={`mr-3 w-12 h-12 text-pink-500 transition-all duration-1000 delay-300`}
           />
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-            수퍼 데이트 이벤트
+            슈퍼 데이트 이벤트
           </h1>
         </div>
         <p className="mx-auto max-w-2xl text-xl text-gray-600 dark:text-gray-300">
@@ -223,7 +221,7 @@ export default function SuperDatePage() {
               참여 방법
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              서로 수퍼데이트 신청
+              서로 슈퍼 데이트 신청
             </p>
           </div>
           <div
@@ -297,7 +295,7 @@ export default function SuperDatePage() {
         </div>
       </div>
 
-      {/* 수퍼데이트 신청 섹션 */}
+      {/* 슈퍼 데이트 신청 섹션 */}
       <div
         className={`p-8 mb-12 bg-white rounded-2xl shadow-lg dark:bg-gray-800 transition-all duration-1000 delay-800 ease-out ${
           animateIn
@@ -307,7 +305,7 @@ export default function SuperDatePage() {
       >
         <div className="mb-8 text-center">
           <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-            수퍼데이트 신청하기
+            슈퍼 데이트 신청하기
           </h2>
           <p className="mb-4 text-gray-600 dark:text-gray-300">
             마음에 드는 상대방에게 진심 어린 메시지와 함께 특별한 데이트를
@@ -315,7 +313,7 @@ export default function SuperDatePage() {
           </p>
           <div className="inline-flex items-center px-4 py-2 text-sm font-medium text-pink-700 bg-pink-100 rounded-full dark:bg-pink-900/30 dark:text-pink-300">
             <Gift className="mr-2 w-4 h-4" />
-            수퍼데이트 신청권: {remainingRequests}개 남음
+            슈퍼 데이트 신청권: {remainingRequests}개 남음
           </div>
         </div>
 
@@ -326,11 +324,11 @@ export default function SuperDatePage() {
             className="flex justify-center items-center px-8 py-4 mx-auto font-medium text-white bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg transition-colors hover:from-pink-600 hover:to-purple-600"
           >
             <Heart className="mr-2 w-6 h-6" />
-            수퍼데이트 신청하기
+            슈퍼 데이트 신청하기
             <ArrowRight className="ml-2 w-6 h-6" />
           </button>
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-            자기소개서 목록에서 마음에 드는 상대방을 찾아 수퍼데이트를
+            자기소개서 목록에서 마음에 드는 상대방을 찾아 슈퍼 데이트를
             신청하세요!
           </p>
         </div>
@@ -359,10 +357,10 @@ export default function SuperDatePage() {
               </span>
             </div>
             <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">
-              수퍼데이트 신청
+              슈퍼 데이트 신청
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              마음에 드는 상대방에게 수퍼데이트를 신청하세요
+              마음에 드는 상대방에게 슈퍼 데이트를 신청하세요
             </p>
           </div>
           <div
@@ -416,12 +414,12 @@ export default function SuperDatePage() {
           ⚠️ 주의사항
         </h3>
         <ul className="space-y-1 text-sm text-yellow-700 dark:text-yellow-300">
-          <li>• 수퍼데이트 신청은 1명당 2명에게만 사용가능합니다</li>
+          <li>• 슈퍼 데이트 신청은 1명당 2명에게만 사용가능합니다</li>
           <li>• 자신에게는 신청할 수 없습니다</li>
           <li>• 기프티콘은 첫 번째 매칭 커플에게만 제공됩니다</li>
           <li>• 매칭 후 개인정보를 통해 기프티콘을 전달합니다</li>
           <li>
-            • 로그인하고 자기소개서 작성한 유저만 수퍼데이트 신청 가능합니다
+            • 로그인하고 자기소개서 작성한 유저만 슈퍼 데이트 신청 가능합니다
           </li>
         </ul>
       </div>

@@ -350,9 +350,9 @@ export const selfIntroductionAPI = {
   },
 };
 
-// 수퍼데이트 신청 관련 API 함수들
+// 슈퍼 데이트 신청 관련 API 함수들
 export const superDateAPI = {
-  // 모든 수퍼데이트 신청 가져오기
+  // 모든 슈퍼 데이트 신청 가져오기
   async getAll() {
     const { data, error } = await supabase
       .from("super_date_requests")
@@ -361,7 +361,7 @@ export const superDateAPI = {
     return { data, error };
   },
 
-  // 사용자가 받은 수퍼데이트 신청 가져오기
+  // 사용자가 받은 슈퍼 데이트 신청 가져오기
   async getReceivedByUserId(userId: string) {
     const { data, error } = await supabase
       .from("super_date_requests")
@@ -371,7 +371,7 @@ export const superDateAPI = {
     return { data, error };
   },
 
-  // 사용자가 보낸 수퍼데이트 신청 가져오기
+  // 사용자가 보낸 슈퍼 데이트 신청 가져오기
   async getSentByUserId(userId: string) {
     const { data, error } = await supabase
       .from("super_date_requests")
@@ -381,7 +381,7 @@ export const superDateAPI = {
     return { data, error };
   },
 
-  // 수퍼데이트 신청 생성
+  // 슈퍼 데이트 신청 생성
   async create(requestData: CreateSuperDateRequestData) {
     const {
       data: { user },
@@ -402,7 +402,7 @@ export const superDateAPI = {
     return { data, error };
   },
 
-  // 수퍼데이트 신청 상태 업데이트
+  // 슈퍼 데이트 신청 상태 업데이트
   async updateStatus(id: string, status: "accepted" | "rejected") {
     const { data, error } = await supabase
       .from("super_date_requests")
@@ -413,7 +413,7 @@ export const superDateAPI = {
     return { data, error };
   },
 
-  // 수퍼데이트 신청 취소
+  // 슈퍼 데이트 신청 취소
   async cancel(id: string) {
     const { data, error } = await supabase
       .from("super_date_requests")

@@ -10,6 +10,7 @@ import {
   Plus,
   Loader2,
   Calendar,
+  X,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
@@ -78,7 +79,7 @@ export default function IntroductionsPage() {
     loadIntroductions();
   }, [user]);
 
-  // 사용자가 보낸 수퍼데이트 신청 로드
+  // 사용자가 보낸 슈퍼 데이트 신청 로드
   useEffect(() => {
     const loadSentRequests = async () => {
       if (!user) return;
@@ -86,7 +87,7 @@ export default function IntroductionsPage() {
       try {
         const { data, error } = await superDateAPI.getSentByUserId(user.id);
         if (error) {
-          console.error("수퍼데이트 신청 로드 오류:", error);
+          console.error("슈퍼 데이트 신청 로드 오류:", error);
         } else {
           const requestIds = new Set(data?.map((req) => req.target_id) || []);
           setSentRequests(requestIds);
@@ -95,7 +96,7 @@ export default function IntroductionsPage() {
           setRemainingRequests(Math.max(0, 2 - usedRequests));
         }
       } catch (err) {
-        console.error("수퍼데이트 신청 로드 오류:", err);
+        console.error("슈퍼 데이트 신청 로드 오류:", err);
       }
     };
 
@@ -147,7 +148,7 @@ export default function IntroductionsPage() {
     total: introductions.length,
   };
 
-  // 수퍼데이트 신청하기
+  // 슈퍼 데이트 신청하기
   const handleSuperDateRequest = async (
     targetId: string,
     targetName: string
@@ -158,14 +159,14 @@ export default function IntroductionsPage() {
     }
 
     if (targetId === user.id) {
-      alert("자신에게는 수퍼데이트를 신청할 수 없습니다.");
+      alert("자신에게는 슈퍼 데이트를 신청할 수 없습니다.");
       return;
     }
 
     // 신청 개수 제한 확인 (2개)
     if (remainingRequests <= 0) {
       alert(
-        "수퍼데이트 신청은 하루에 2개까지만 가능합니다. 기존 신청을 취소하고 다시 시도해주세요."
+        "슈퍼 데이트 신청은 하루에 2개까지만 가능합니다. 기존 신청을 취소하고 다시 시도해주세요."
       );
       return;
     }
@@ -179,16 +180,16 @@ export default function IntroductionsPage() {
       });
 
       if (error) {
-        console.error("수퍼데이트 신청 오류:", error);
-        alert("수퍼데이트 신청에 실패했습니다.");
+        console.error("슈퍼 데이트 신청 오류:", error);
+        alert("슈퍼 데이트 신청에 실패했습니다.");
       } else {
         setSentRequests((prev) => new Set(prev).add(targetId));
         setRemainingRequests((prev) => Math.max(0, prev - 1));
-        alert("수퍼데이트 신청이 완료되었습니다!");
+        alert("슈퍼 데이트 신청이 완료되었습니다!");
       }
     } catch (err) {
-      console.error("수퍼데이트 신청 오류:", err);
-      alert("수퍼데이트 신청에 실패했습니다.");
+      console.error("슈퍼 데이트 신청 오류:", err);
+      alert("슈퍼 데이트 신청에 실패했습니다.");
     } finally {
       setLoadingRequests((prev) => {
         const newSet = new Set(prev);
@@ -198,7 +199,7 @@ export default function IntroductionsPage() {
     }
   };
 
-  // 수퍼데이트 신청 취소하기
+  // 슈퍼 데이트 신청 취소하기
   const handleSuperDateCancel = async (targetId: string) => {
     if (!user) return;
 
@@ -225,7 +226,7 @@ export default function IntroductionsPage() {
       const { error } = await superDateAPI.cancel(request.id);
 
       if (error) {
-        console.error("수퍼데이트 신청 취소 오류:", error);
+        console.error("슈퍼 데이트 신청 취소 오류:", error);
         alert("신청 취소에 실패했습니다.");
       } else {
         setSentRequests((prev) => {
@@ -234,10 +235,10 @@ export default function IntroductionsPage() {
           return newSet;
         });
         setRemainingRequests((prev) => Math.min(2, prev + 1));
-        alert("수퍼데이트 신청이 취소되었습니다.");
+        alert("슈퍼 데이트 신청이 취소되었습니다.");
       }
     } catch (err) {
-      console.error("수퍼데이트 신청 취소 오류:", err);
+      console.error("슈퍼 데이트 신청 취소 오류:", err);
       alert("신청 취소에 실패했습니다.");
     } finally {
       setLoadingRequests((prev) => {
@@ -338,13 +339,13 @@ export default function IntroductionsPage() {
           )}
         </div>
 
-        {/* 수퍼데이트 신청권 표시 */}
+        {/* 슈퍼 데이트 신청권 표시 */}
         {user && (
           <div className="p-4 mt-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg border border-pink-200 dark:from-pink-900/20 dark:to-purple-900/20 dark:border-pink-700">
             <div className="flex justify-center items-center space-x-2">
               <Calendar className="w-5 h-5 text-pink-600 dark:text-pink-400" />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                수퍼데이트 신청권:
+                슈퍼 데이트 신청권:
               </span>
               <span
                 className={`text-lg font-bold ${
@@ -667,7 +668,7 @@ export default function IntroductionsPage() {
                     )}
                   </div>
 
-                  {/* 수퍼데이트 버튼 */}
+                  {/* 슈퍼 데이트 버튼 */}
                   {user && user.id !== intro.user_id && (
                     <div className="flex gap-2">
                       {sentRequests.has(intro.user_id) ? (
@@ -682,7 +683,7 @@ export default function IntroductionsPage() {
                           {loadingRequests.has(intro.user_id) ? (
                             <Loader2 className="mr-1 w-3 h-3 animate-spin" />
                           ) : (
-                            <Calendar className="mr-1 w-3 h-3" />
+                            <X className="mr-1 w-3 h-3" />
                           )}
                           신청 취소
                         </button>
@@ -711,7 +712,7 @@ export default function IntroductionsPage() {
                             <Calendar className="mr-1 w-3 h-3" />
                           )}
                           {remainingRequests > 0
-                            ? "수퍼데이트 신청"
+                            ? "슈퍼 데이트 신청"
                             : "신청권 소진"}
                         </button>
                       )}

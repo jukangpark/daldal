@@ -18,7 +18,7 @@ Next.js와 Supabase를 활용한 현대적인 데이팅 웹 애플리케이션�
 - 실시간 검색 및 필터링
 - 성별, 관심사별 필터링
 
-### 💕 수퍼데이트 신청
+### 💕 슈퍼 데이트 신청
 
 - 마음에 드는 상대방에게 특별한 데이트 제안
 - 진심 어린 메시지와 함께 신청
@@ -99,7 +99,7 @@ yarn dev
 
 ### super_date_requests 테이블
 
-- 수퍼데이트 신청 정보
+- 슈퍼 데이트 신청 정보
 - 신청자 및 대상자 정보
 - 메시지 및 상태 관리
 
@@ -145,7 +145,7 @@ yarn dev
 - `/` - 홈페이지
 - `/introductions` - 자기소개서 목록
 - `/introductions/write` - 자기소개서 작성
-- `/super-date` - 수퍼데이트 신청
+- `/super-date` - 슈퍼 데이트 신청
 - `/daldalChat` - 달달톡 (익명 채팅)
 - `/profile` - 내 정보 (로그인 필요)
 - `/rules` - 모임회칙
@@ -168,9 +168,9 @@ yarn dev
 - `selfIntroductionAPI.update()` - 자기소개서 수정
 - `selfIntroductionAPI.delete()` - 자기소개서 삭제
 
-### 수퍼데이트 관련
+### 슈퍼 데이트 관련
 
-- `superDateAPI.create()` - 수퍼데이트 신청 생성
+- `superDateAPI.create()` - 슈퍼 데이트 신청 생성
 - `superDateAPI.updateStatus()` - 신청 상태 업데이트
 - `superDateAPI.getReceivedByUserId()` - 받은 신청 조회
 - `superDateAPI.getSentByUserId()` - 보낸 신청 조회
