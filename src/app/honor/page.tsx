@@ -6,16 +6,10 @@ import { useRouter } from "next/navigation";
 import {
   Trophy,
   Crown,
-  Star,
   Heart,
   Users,
   Sparkles,
-  Award,
-  Medal,
   User,
-  UserCheck,
-  Eye,
-  Camera,
   Loader2,
   Flame,
   HeartHandshake,
@@ -36,46 +30,46 @@ const categoryInfo = {
     label: "핫 걸",
     icon: Flame,
     color: "text-pink-500",
-    bgColor: "bg-pink-50 dark:bg-pink-900/20",
+    bgColor: "bg-pink-400 dark:bg-pink-900/40",
     gender: "female" as const,
   },
   hot_boy: {
     label: "핫 보이",
     icon: Flame,
     color: "text-blue-500",
-    bgColor: "bg-blue-50 dark:bg-blue-900/20",
+    bgColor: "bg-blue-400 dark:bg-blue-900/40",
     gender: "male" as const,
   },
   manner: {
     label: "매너",
     icon: HeartHandshake,
     color: "text-green-500",
-    bgColor: "bg-green-50 dark:bg-green-900/20",
+    bgColor: "bg-green-400 dark:bg-green-900/40",
   },
   sexy: {
-    label: "섹시",
+    label: "세쿠시",
     icon: Sparkles,
     color: "text-purple-500",
-    bgColor: "bg-purple-50 dark:bg-purple-900/20",
+    bgColor: "bg-purple-400 dark:bg-purple-900/40",
   },
   cute: {
     label: "귀여운",
     icon: Heart,
     color: "text-red-500",
-    bgColor: "bg-red-50 dark:bg-red-900/20",
+    bgColor: "bg-red-400 dark:bg-red-900/40",
   },
   style: {
-    label: "스타일",
+    label: "패피",
     icon: Palette,
     color: "text-yellow-500",
-    bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
+    bgColor: "bg-yellow-400 dark:bg-yellow-900/40",
   },
 };
 
 const rankIcons = [
-  <Crown key="1" className="w-6 h-6 text-yellow-500" />,
-  <Medal key="2" className="w-6 h-6 text-gray-400" />,
-  <Award key="3" className="w-6 h-6 text-amber-600" />,
+  <span key="1">🥇</span>,
+  <span key="2">🥈</span>,
+  <span key="3">🥉</span>,
 ];
 
 export default function HonorPage() {
@@ -168,7 +162,7 @@ export default function HonorPage() {
 
     return (
       <div
-        className="flex items-center p-4 bg-white rounded-lg shadow-md transition-all duration-300 cursor-pointer dark:bg-gray-800 hover:shadow-lg hover:scale-105"
+        className="transition-shadow cursor-pointer card hover:shadow-lg animate-fade-in-up"
         onClick={() => {
           if (userIntroduction) {
             router.push(`/introductions/${userIntroduction.id}`);
@@ -176,14 +170,13 @@ export default function HonorPage() {
         }}
       >
         <div className="flex items-center space-x-4">
-          {/* 순위 아이콘 */}
+          {/* 순위 표시 */}
           <div className="flex-shrink-0">
-            {result.rank && result.rank <= 3 ? (
-              rankIcons[result.rank - 1]
-            ) : (
-              <span className="flex justify-center items-center w-6 h-6 text-sm font-bold text-gray-500 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-400">
-                {result.rank}
-              </span>
+            {/* 메달 아이콘 */}
+            {result.rank && result.rank <= 3 && (
+              <div className="flex-shrink-0 text-4xl">
+                {rankIcons[result.rank - 1]}
+              </div>
             )}
           </div>
 
@@ -220,10 +213,6 @@ export default function HonorPage() {
               </h3>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                {result.rank}위
-              </span>
-
               {userIntroduction && (
                 <span className="text-xs text-primary-600 dark:text-primary-400">
                   자소설 보기 →
@@ -261,11 +250,11 @@ export default function HonorPage() {
         }`}
         style={{ transitionDelay: `${delay}ms` }}
       >
-        <div className="flex items-center mb-6">
-          <Icon className={`mr-3 w-6 h-6 ${categoryData.color}`} />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {title}
-          </h2>
+        <div
+          className={`flex items-center mb-6 p-4 rounded-lg ${categoryData.bgColor}`}
+        >
+          <Icon className="mr-3 w-6 h-6 text-white" />
+          <h2 className="text-2xl font-bold text-white">{title}</h2>
         </div>
         {categoryResults.length > 0 ? (
           <div className="space-y-4">
@@ -331,22 +320,39 @@ export default function HonorPage() {
     <div className="mx-auto max-w-6xl">
       {/* 배너 */}
       <div
-        className={`relative mb-12 overflow-hidden rounded-2xl bg-gradient-to-r from-pink-400 via-rose-500 to-fuchsia-600 p-8 text-white shadow-2xl transition-all duration-1000 ease-out ${
+        className={`relative mb-12 overflow-hidden bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-600 p-12 text-white shadow-2xl transition-all duration-1000 ease-out ${
           animateIn ? "opacity-100 scale-100" : "opacity-0 scale-95"
         }`}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+        {/* 고급스러운 배경 패턴 */}
+        <div className="absolute inset-0 bg-gradient-to-r to-transparent from-black/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-transparent via-white/5"></div>
+
         <div className="relative z-10 text-center">
-          <div className="flex justify-center items-center mb-6">
-            <Trophy className="mr-4 w-16 h-16 text-pink-200" />
-            <h1 className="text-5xl font-bold text-white drop-shadow-lg">
-              명예의 전당
-            </h1>
+          <div className="flex relative justify-center items-center mb-4">
+            {/* 텍스트 오버레이 */}
+            <div className="relative z-10 text-center">
+              <h1 className="text-5xl font-bold text-white drop-shadow-lg">
+                🏆 명예의 전당 🏆
+              </h1>
+            </div>
           </div>
-          <p className="mx-auto mb-8 max-w-2xl text-xl text-white/90">
-            🎉 가장 인기 있는 회원들을 소개합니다 🎉
+
+          <p className="mx-auto max-w-3xl text-xl font-medium text-white/95">
+            그대에게 명예를!
           </p>
         </div>
+
+        {/* 반짝이는 효과 */}
+        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-yellow-300 rounded-full animate-ping"></div>
+        <div
+          className="absolute top-3/4 right-1/4 w-1 h-1 bg-yellow-300 rounded-full animate-ping"
+          style={{ animationDelay: "0.5s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-yellow-300 rounded-full animate-ping"
+          style={{ animationDelay: "1s" }}
+        ></div>
       </div>
 
       {/* 투표하기 버튼 */}
@@ -359,10 +365,9 @@ export default function HonorPage() {
               setShowLoginModal(true);
             }
           }}
-          className="flex items-center px-8 py-4 mb-12 text-white bg-gradient-to-r from-pink-400 to-rose-500 rounded-full border-2 border-pink-300 shadow-xl backdrop-blur-sm transition-all duration-300 transform hover:from-pink-500 hover:to-rose-600 hover:border-pink-400 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-pink-300 focus:ring-offset-2"
+          className="flex items-center px-8 py-4 mb-12 text-black rounded-xl border-2 shadow-lg transition-all duration-300 transform dark:text-white bg:text-white hover:from-yellow-700 hover:to-purple-700 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-offset-2"
         >
-          <Heart className="mr-2 w-5 h-5" />
-          익명으로 투표하기
+          🗳️ 익명으로 투표하기
         </button>
       </div>
 
@@ -378,13 +383,13 @@ export default function HonorPage() {
           {/* HOT 섹션 */}
           <div className="grid gap-8 mb-12 lg:grid-cols-2">
             <HonorSection
-              title="핫 걸 TOP3"
+              title="핫 걸"
               category="hot_girl"
               icon={Flame}
               delay={200}
             />
             <HonorSection
-              title="핫 보이 TOP3"
+              title="핫 보이"
               category="hot_boy"
               icon={Flame}
               delay={400}
@@ -394,28 +399,28 @@ export default function HonorPage() {
           {/* 기타 카테고리 섹션들 */}
           <div className="space-y-8">
             <HonorSection
-              title="매너 TOP3"
+              title="매너"
               category="manner"
               icon={HeartHandshake}
               delay={600}
             />
 
             <HonorSection
-              title="섹시 TOP3"
+              title="세쿠시"
               category="sexy"
               icon={Sparkles}
               delay={800}
             />
 
             <HonorSection
-              title="귀요미 TOP3"
+              title="귀요미"
               category="cute"
               icon={Heart}
               delay={1000}
             />
 
             <HonorSection
-              title="스타일 TOP3"
+              title="패피"
               category="style"
               icon={Palette}
               delay={1200}
@@ -442,15 +447,7 @@ export default function HonorPage() {
             다음 달에도 좋은 모습 보여주세요! 🏆
           </p>
           <div className="flex justify-center items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-            <Crown className="w-4 h-4 animate-bounce" />
-            <span>
-              업데이트 일자 :{" "}
-              {new Date().toLocaleDateString("ko-KR", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
+            <Crown className="mr-2 w-4 h-4 animate-bounce" /> 실시간 집계중...
           </div>
         </div>
       </div>

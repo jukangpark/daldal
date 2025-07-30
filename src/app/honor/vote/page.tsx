@@ -42,53 +42,60 @@ interface CategoryInfo {
   description: string;
   icon: React.ReactNode;
   color: string;
+  bgColor: string;
   gender?: "male" | "female";
 }
 
 const CATEGORIES: CategoryInfo[] = [
   {
     id: "hot_girl",
-    title: "핫 걸 TOP3",
-    description: "가장 매력적인 여성에게 투표하세요",
+    title: "핫 걸",
+    description: "너 내꺼 할래?",
     icon: <Flame className="w-6 h-6" />,
     color: "text-pink-500",
+    bgColor: "bg-pink-400 dark:bg-pink-900/40",
     gender: "female",
   },
   {
     id: "hot_boy",
-    title: "핫 보이 TOP3",
-    description: "가장 매력적인 남성에게 투표하세요",
+    title: "핫 보이",
+    description: "너 내꺼 할래?",
     icon: <Flame className="w-6 h-6" />,
     color: "text-blue-500",
+    bgColor: "bg-blue-400 dark:bg-blue-900/40",
     gender: "male",
   },
   {
     id: "manner",
-    title: "매너 TOP3",
+    title: "매너",
     description: "가장 예의 바른 사람에게 투표하세요",
     icon: <HeartHandshake className="w-6 h-6" />,
     color: "text-green-500",
+    bgColor: "bg-green-400 dark:bg-green-900/40",
   },
   {
     id: "sexy",
-    title: "섹시 TOP3",
-    description: "가장 섹시한 사람에게 투표하세요",
+    title: "세쿠시",
+    description: "가장 세쿠시한 사람에게 투표하세요",
     icon: <Sparkles className="w-6 h-6" />,
     color: "text-purple-500",
+    bgColor: "bg-purple-400 dark:bg-purple-900/40",
   },
   {
     id: "cute",
-    title: "귀요미 TOP3",
-    description: "가장 귀여운 사람에게 투표하세요",
+    title: "귀여운",
+    description: "가장 귀요미한 사람에게 투표하세요",
     icon: <Heart className="w-6 h-6" />,
     color: "text-red-500",
+    bgColor: "bg-red-400 dark:bg-red-900/40",
   },
   {
     id: "style",
-    title: "스타일 TOP3",
+    title: "패피",
     description: "가장 스타일리시한 사람에게 투표하세요",
     icon: <Palette className="w-6 h-6" />,
     color: "text-yellow-500",
+    bgColor: "bg-yellow-400 dark:bg-yellow-900/40",
   },
 ];
 
@@ -289,9 +296,8 @@ export default function HonorVotePage() {
 
         <div className="text-center">
           <div className="flex justify-center items-center mb-4">
-            <Trophy className="mr-3 w-12 h-12 text-primary-600" />
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-              익명 투표
+              🏆 익명 투표 🏆
             </h1>
           </div>
           <p className="text-xl text-gray-600 dark:text-gray-300">
@@ -322,11 +328,11 @@ export default function HonorVotePage() {
 
               return (
                 <div key={category.id} className="card">
-                  <div className="flex items-center mb-4">
-                    <div className={`p-2 rounded-lg mr-3 ${category.color}`}>
-                      {category.icon}
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <div
+                    className={`flex items-center mb-4 p-4 rounded-lg ${category.bgColor}`}
+                  >
+                    <div className="mr-3 text-white">{category.icon}</div>
+                    <h3 className="text-lg font-semibold text-white">
                       {category.title}
                     </h3>
                   </div>
