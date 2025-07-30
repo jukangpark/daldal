@@ -332,15 +332,11 @@ export default function HonorPage() {
           <div className="flex relative justify-center items-center mb-4">
             {/* 텍스트 오버레이 */}
             <div className="relative z-10 text-center">
-              <h1 className="text-5xl font-bold text-white drop-shadow-lg">
+              <h1 className="text-3xl font-bold text-white drop-shadow-lg sm:text-3xl md:text-4xl lg:text-5xl">
                 🏆 명예의 전당 🏆
               </h1>
             </div>
           </div>
-
-          <p className="mx-auto max-w-3xl text-xl font-medium text-white/95">
-            그대에게 명예를!
-          </p>
         </div>
 
         {/* 반짝이는 효과 */}
