@@ -9,13 +9,13 @@ import {
   Plus,
   Loader2,
   User,
-  Gift,
   Edit,
   Trash2,
   ChevronLeft,
   ChevronRight,
   HelpCircle,
 } from "lucide-react";
+import UserAvatar from "@/components/UserAvatar";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   selfIntroductionAPI,
@@ -457,8 +457,14 @@ export default function ProfilePage() {
 
                 <div className="flex items-center space-x-2 text-xs text-gray-600 md:space-x-6 md:text-sm dark:text-gray-300">
                   <div className="flex items-center">
-                    <User className="mr-1 w-3 h-3 md:mr-2 md:w-4 md:h-4" />
-                    <span className="whitespace-nowrap">
+                    <UserAvatar
+                      imageUrl={selfIntro.photos?.[0]}
+                      userName={selfIntro.user_name}
+                      gender={selfIntro.user_gender}
+                      size="md"
+                      isVVIP={selfIntro.isVVIP}
+                    />
+                    <span className="ml-2 whitespace-nowrap">
                       {selfIntro.user_name} ({selfIntro.user_age}세)
                     </span>
                   </div>
@@ -843,22 +849,17 @@ export default function ProfilePage() {
                   <div className="grid gap-6 md:grid-cols-2">
                     {/* 상대방 프로필 */}
                     <div className="flex items-start space-x-4">
-                      {person.photo &&
-                      person.photo !== "/default-avatar.png" ? (
-                        <img
-                          src={person.photo}
-                          alt={person.name}
-                          className="object-cover w-20 h-20 rounded-full"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = "/default-avatar.png";
-                          }}
-                        />
-                      ) : (
-                        <div className="flex justify-center items-center w-20 h-20 bg-gray-100 rounded-full dark:bg-gray-700">
-                          <User className="w-10 h-10 text-gray-400 dark:text-gray-500" />
-                        </div>
-                      )}
+                      <UserAvatar
+                        imageUrl={
+                          person.photo !== "/default-avatar.png"
+                            ? person.photo
+                            : null
+                        }
+                        userName={person.name}
+                        gender="male" // 여기서는 성별 정보가 없으므로 기본값 사용
+                        size="lg"
+                        isVVIP={false}
+                      />
                       <div className="flex-1">
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                           {person.name}
