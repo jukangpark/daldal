@@ -19,6 +19,7 @@ import {
   X,
   Send,
 } from "lucide-react";
+import UserAvatar from "@/components/UserAvatar";
 
 export default function IntroductionDetailPage() {
   const params = useParams();
@@ -268,8 +269,16 @@ export default function IntroductionDetailPage() {
 
           <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-300">
             <div className="flex items-center">
-              <User className="mr-2 w-4 h-4" />
-              {introduction.user_name} ({introduction.user_age}세)
+              <UserAvatar
+                imageUrl={introduction.photos?.[0]}
+                userName={introduction.user_name}
+                gender={introduction.user_gender}
+                size="md"
+                isVVIP={introduction.isVVIP}
+              />
+              <span className="ml-3">
+                {introduction.user_name} ({introduction.user_age}세)
+              </span>
             </div>
             <div className="flex items-center">
               <MapPin className="mr-2 w-4 h-4" />

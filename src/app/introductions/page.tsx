@@ -45,7 +45,6 @@ export default function IntroductionsPage() {
     new Set()
   );
   const [remainingRequests, setRemainingRequests] = useState<number>(2);
-  const [matches, setMatches] = useState<any[]>([]);
   const [hasExistingIntroduction, setHasExistingIntroduction] =
     useState<boolean>(false);
 
