@@ -22,6 +22,7 @@ import {
 import LoginModal from "@/components/LoginModal";
 import SignupModal from "@/components/SignupModal";
 import UserAvatar from "@/components/UserAvatar";
+import MbtiBadge from "@/components/MbtiBadge";
 
 export default function IntroductionsPage() {
   const { user } = useAuth();
@@ -646,10 +647,7 @@ export default function IntroductionsPage() {
                       />
                       <span className="text-sm text-white-500 dark:text-white">
                         {intro.user_name}
-                        <span className="hidden sm:inline">
-                          {" "}
-                          ({intro.user_age})
-                        </span>
+                        <span className="sm:inline"> ({intro.user_age})</span>
                       </span>
                     </div>
 
@@ -706,11 +704,7 @@ export default function IntroductionsPage() {
                   </div>
 
                   <div className="mt-3">
-                    {intro.mbti && (
-                      <span className="px-2 py-1 text-xs text-purple-700 bg-purple-100 rounded-full dark:bg-purple-600 dark:text-white">
-                        {intro.mbti}
-                      </span>
-                    )}
+                    {intro.mbti && <MbtiBadge mbti={intro.mbti} size="sm" />}
                   </div>
 
                   {/* 제목 */}

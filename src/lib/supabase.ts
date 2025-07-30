@@ -80,6 +80,7 @@ export interface CreateSelfIntroductionData {
   mbti?: string;
   hobbies?: string;
   special_skills?: string;
+  isVVIP?: boolean;
 }
 
 export interface SuperDateVote {
