@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Locate,
+  LocateIcon,
+  LocateFixed,
+} from "lucide-react";
 import { SelfIntroduction } from "@/lib/supabase";
 import UserAvatar from "@/components/UserAvatar";
 import MbtiBadge from "@/components/MbtiBadge";
@@ -86,8 +94,8 @@ export default function SelfIntroductionCard({
                 {introduction.title}
               </h1>
 
-              <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-300">
-                <div className="flex items-center">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
+                <div className="flex items-center mb-2">
                   <UserAvatar
                     imageUrl={introduction.photos?.[0]}
                     userName={introduction.user_name}
@@ -99,22 +107,22 @@ export default function SelfIntroductionCard({
                     {introduction.user_name} ({introduction.user_age})
                   </span>
                 </div>
-                {introduction.user_location && (
-                  <div className="flex items-center">
+                <div className="flex items-center mt-3 space-x-4">
+                  <span
+                    className={`px-3 py-1 text-xs rounded-full ${
+                      introduction.user_gender === "male"
+                        ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                        : "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300"
+                    }`}
+                  >
+                    {introduction.user_gender === "male" ? "남성" : "여성"}
+                  </span>
+                  {introduction.user_location && (
                     <span className="whitespace-nowrap">
                       {introduction.user_location}
                     </span>
-                  </div>
-                )}
-                <span
-                  className={`px-3 py-1 text-xs rounded-full ${
-                    introduction.user_gender === "male"
-                      ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-                      : "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300"
-                  }`}
-                >
-                  {introduction.user_gender === "male" ? "남성" : "여성"}
-                </span>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -141,12 +149,12 @@ export default function SelfIntroductionCard({
         </div>
 
         {/* 자기소개 내용 */}
-        <div className="mb-6">
-          <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+        <div className="mb-8">
+          <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
             자기소개
           </h2>
           <div className="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
-            <p className="text-gray-700 whitespace-pre-wrap dark:text-gray-300">
+            <p className="text-base leading-relaxed text-gray-700 whitespace-pre-wrap dark:text-gray-300">
               {introduction.content}
             </p>
           </div>
@@ -162,39 +170,39 @@ export default function SelfIntroductionCard({
           introduction.mbti ||
           introduction.hobbies ||
           introduction.special_skills) && (
-          <div className="mb-6">
-            <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+          <div className="mb-8">
+            <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">
               상세 정보
             </h2>
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2">
               {introduction.ideal_physical_type && (
-                <div>
-                  <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                <div className="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
+                  <h3 className="mb-3 text-base font-bold text-gray-800 dark:text-white">
                     외적 이상형
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
+                  <p className="text-base text-gray-700 dark:text-gray-300">
                     {introduction.ideal_physical_type}
                   </p>
                 </div>
               )}
 
               {introduction.ideal_personality_type && (
-                <div>
-                  <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                <div className="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
+                  <h3 className="mb-3 text-base font-bold text-gray-800 dark:text-white">
                     내적 이상형
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
+                  <p className="text-base text-gray-700 dark:text-gray-300">
                     {introduction.ideal_personality_type}
                   </p>
                 </div>
               )}
 
               {introduction.dating_style && (
-                <div>
-                  <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                <div className="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
+                  <h3 className="mb-3 text-base font-bold text-gray-800 dark:text-white">
                     연애 스타일
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
+                  <p className="text-base text-gray-700 dark:text-gray-300">
                     {introduction.dating_style === "active" && "적극적"}
                     {introduction.dating_style === "passive" && "소극적"}
                     {introduction.dating_style === "balanced" && "균형잡힌"}
@@ -207,11 +215,11 @@ export default function SelfIntroductionCard({
               )}
 
               {introduction.alcohol_tolerance && (
-                <div>
-                  <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                <div className="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
+                  <h3 className="mb-3 text-base font-bold text-gray-800 dark:text-white">
                     주량
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
+                  <p className="text-base text-gray-700 dark:text-gray-300">
                     {introduction.alcohol_tolerance === "none" &&
                       "술을 마시지 않음"}
                     {introduction.alcohol_tolerance === "light" &&
@@ -226,11 +234,11 @@ export default function SelfIntroductionCard({
               )}
 
               {introduction.smoking_status && (
-                <div>
-                  <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                <div className="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
+                  <h3 className="mb-3 text-base font-bold text-gray-800 dark:text-white">
                     흡연 여부
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
+                  <p className="text-base text-gray-700 dark:text-gray-300">
                     {introduction.smoking_status === "non-smoker" && "비흡연자"}
                     {introduction.smoking_status === "ex-smoker" && "금연자"}
                     {introduction.smoking_status === "cigarette" && "연초"}
@@ -245,8 +253,8 @@ export default function SelfIntroductionCard({
               )}
 
               {introduction.mbti && (
-                <div>
-                  <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                <div className="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
+                  <h3 className="mb-3 text-base font-bold text-gray-800 dark:text-white">
                     MBTI
                   </h3>
                   <MbtiBadge mbti={introduction.mbti} size="md" />
@@ -255,35 +263,35 @@ export default function SelfIntroductionCard({
             </div>
 
             {/* 텍스트 영역 정보들 */}
-            <div className="mt-6 space-y-4">
+            <div className="mt-8 space-y-6">
               {introduction.charm_appeal && (
-                <div>
-                  <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                <div className="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
+                  <h3 className="mb-3 text-base font-bold text-gray-800 dark:text-white">
                     나의 매력 어필
                   </h3>
-                  <p className="text-gray-600 whitespace-pre-wrap dark:text-gray-300">
+                  <p className="text-base leading-relaxed text-gray-700 whitespace-pre-wrap dark:text-gray-300">
                     {introduction.charm_appeal}
                   </p>
                 </div>
               )}
 
               {introduction.hobbies && (
-                <div>
-                  <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                <div className="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
+                  <h3 className="mb-3 text-base font-bold text-gray-800 dark:text-white">
                     취미
                   </h3>
-                  <p className="text-gray-600 whitespace-pre-wrap dark:text-gray-300">
+                  <p className="text-base leading-relaxed text-gray-700 whitespace-pre-wrap dark:text-gray-300">
                     {introduction.hobbies}
                   </p>
                 </div>
               )}
 
               {introduction.special_skills && (
-                <div>
-                  <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                <div className="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
+                  <h3 className="mb-3 text-base font-bold text-gray-800 dark:text-white">
                     특기
                   </h3>
-                  <p className="text-gray-600 whitespace-pre-wrap dark:text-gray-300">
+                  <p className="text-base leading-relaxed text-gray-700 whitespace-pre-wrap dark:text-gray-300">
                     {introduction.special_skills}
                   </p>
                 </div>
@@ -294,8 +302,8 @@ export default function SelfIntroductionCard({
 
         {/* 사진 갤러리 */}
         {introduction.photos && introduction.photos.length > 0 && (
-          <div className="mb-6">
-            <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+          <div className="mb-8">
+            <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">
               사진 ({currentPhotoIndex + 1} / {introduction.photos.length})
             </h2>
 

@@ -258,7 +258,7 @@ export default function IntroductionsPage() {
             자소설 목록
           </h1>
           <p className="mx-auto max-w-2xl text-xl text-gray-600 dark:text-gray-300">
-            자소설을 읽고 슈데권을 신청하세요! 일단 질러 ⭐️
+            슈데권을 신청해! 일단 질러 ⭐️
           </p>
         </div>
 
@@ -282,7 +282,7 @@ export default function IntroductionsPage() {
             자소설 목록
           </h1>
           <p className="mx-auto max-w-2xl text-xl text-gray-600 dark:text-gray-300">
-            자소설을 읽고 슈데권을 신청하세요! 일단 질러 ⭐️
+            슈데권을 신청해! 일단 질러 ⭐️
           </p>
         </div>
 
@@ -344,7 +344,7 @@ export default function IntroductionsPage() {
         {user && (
           <div className="p-4 mt-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg border border-pink-200 dark:from-pink-900/20 dark:to-purple-900/20 dark:border-pink-700">
             <div className="flex justify-center items-center space-x-2">
-              <Calendar className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+              <Heart className="w-5 h-5 text-pink-600 dark:text-pink-400" />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 슈퍼 데이트 신청권:
               </span>
@@ -692,10 +692,10 @@ export default function IntroductionsPage() {
                             {loadingRequests.has(intro.user_id) ? (
                               <Loader2 className="mr-1 w-3 h-3 animate-spin" />
                             ) : (
-                              <Calendar className="mr-1 w-3 h-3" />
+                              <Heart className="mr-1 w-3 h-3" />
                             )}
                             {remainingRequests > 0
-                              ? "슈퍼 데이트 신청"
+                              ? "슈데 신청"
                               : "신청권 소진"}
                           </button>
                         )}
