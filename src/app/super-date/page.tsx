@@ -180,16 +180,16 @@ export default function SuperDatePage() {
             />
           </div>
           <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">
-            🎬 CGV 커플 콤보 기프티콘 🎬
+            매칭자 이벤트
           </h2>
-          <p className="mb-6 text-lg text-gray-700 dark:text-gray-300">
+          <div className="mb-6 text-lg text-gray-700 dark:text-gray-300">
             서로를 선택한 첫 번째 커플에게
             <br />
-            <span className="font-bold text-pink-600 dark:text-pink-400">
-              CGV 커플 콤보 기프티콘
-            </span>
+            <div className="font-bold text-pink-600 dark:text-pink-400">
+              🎬 CGV 커플 콤보 기프티콘 🎬
+            </div>
             을 선물로 드립니다!
-          </p>
+          </div>
         </div>
 
         {/* 이벤트 상세 정보 */}

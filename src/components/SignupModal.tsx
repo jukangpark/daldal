@@ -53,17 +53,7 @@ export default function SignupModal({
       if (error) {
         setError(error.message || "회원가입에 실패했습니다.");
       } else {
-        setSuccess("작성하신 이메일로 인증 메일을 발송했습니다.");
-        // 폼 초기화
-        setTimeout(() => {
-          onClose();
-          setEmail("");
-          setPassword("");
-          setConfirmPassword("");
-          setName("");
-          setError("");
-          setSuccess("");
-        }, 4000);
+        setSuccess(`${email} 으로 인증 메일을 발송했습니다.`);
       }
     } catch (error) {
       console.error("Signup error:", error);
