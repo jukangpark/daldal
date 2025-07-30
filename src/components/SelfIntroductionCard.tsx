@@ -1,15 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
-import {
-  Edit,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  Locate,
-  LocateIcon,
-  LocateFixed,
-} from "lucide-react";
+import { Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { SelfIntroduction } from "@/lib/supabase";
 import UserAvatar from "@/components/UserAvatar";
 import MbtiBadge from "@/components/MbtiBadge";
@@ -30,17 +21,12 @@ export default function SelfIntroductionCard({
   index = 0,
 }: SelfIntroductionCardProps) {
   const router = useRouter();
-  const { user } = useAuth();
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const handleCardClick = () => {
-    if (!showEditButtons) {
-      router.push(`/introductions/${introduction.id}`);
-    }
-  };
-
-  const handlePreviousPhoto = () => {
+  const handlePreviousPhoto = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (introduction.photos && introduction.photos.length > 0) {
       setCurrentPhotoIndex((prev) =>
         prev === 0 ? introduction.photos.length - 1 : prev - 1
@@ -48,7 +34,9 @@ export default function SelfIntroductionCard({
     }
   };
 
-  const handleNextPhoto = () => {
+  const handleNextPhoto = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (introduction.photos && introduction.photos.length > 0) {
       setCurrentPhotoIndex((prev) =>
         prev === introduction.photos.length - 1 ? 0 : prev + 1
@@ -80,11 +68,8 @@ export default function SelfIntroductionCard({
   return (
     <>
       <div
-        className={`transition-shadow card hover:shadow-lg animate-fade-in-up ${
-          !showEditButtons ? "cursor-pointer" : ""
-        }`}
+        className={`transition-shadow card hover:shadow-lg animate-fade-in-up`}
         style={{ animationDelay: `${index * 0.1}s` }}
-        onClick={handleCardClick}
       >
         {/* 제목 및 기본 정보 */}
         <div className="mb-6">
@@ -310,11 +295,11 @@ export default function SelfIntroductionCard({
             {/* 슬라이더 컨테이너 */}
             <div className="relative">
               {/* 메인 이미지 */}
-              <div className="overflow-hidden relative bg-gray-100 rounded-lg dark:bg-gray-700 animate-fade-in-up">
+              <div className="overflow-hidden relative h-96 bg-gray-100 rounded-lg dark:bg-gray-700 animate-fade-in-up">
                 <img
                   src={introduction.photos[currentPhotoIndex]}
                   alt={`Photo ${currentPhotoIndex + 1}`}
-                  className="object-contain w-full h-96 transition-all duration-300"
+                  className="object-contain w-full h-full transition-all duration-300"
                   loading="lazy"
                 />
               </div>
@@ -325,6 +310,7 @@ export default function SelfIntroductionCard({
                   {/* 이전 버튼 */}
                   <button
                     onClick={handlePreviousPhoto}
+                    type="button"
                     className="flex absolute left-4 top-1/2 justify-center items-center w-10 h-10 text-white rounded-full transition-all duration-200 transform -translate-y-1/2 bg-black/50 hover:bg-black/70"
                   >
                     <ChevronLeft className="w-6 h-6" />
@@ -333,6 +319,7 @@ export default function SelfIntroductionCard({
                   {/* 다음 버튼 */}
                   <button
                     onClick={handleNextPhoto}
+                    type="button"
                     className="flex absolute right-4 top-1/2 justify-center items-center w-10 h-10 text-white rounded-full transition-all duration-200 transform -translate-y-1/2 bg-black/50 hover:bg-black/70"
                   >
                     <ChevronRight className="w-6 h-6" />
@@ -346,7 +333,12 @@ export default function SelfIntroductionCard({
                   {introduction.photos.map((_, index) => (
                     <button
                       key={index}
-                      onClick={() => setCurrentPhotoIndex(index)}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setCurrentPhotoIndex(index);
+                      }}
                       className={`w-3 h-3 rounded-full transition-all duration-200 ${
                         index === currentPhotoIndex
                           ? "bg-primary-600"
