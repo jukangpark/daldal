@@ -10,9 +10,9 @@ Next.js와 Supabase를 활용한 현대적인 데이팅 웹 애플리케이션�
 - Supabase Auth를 활용한 안전한 인증
 - 로그인 상태에 따른 조건부 UI
 
-### 📝 자기소개서 시스템
+### 📝 자소설 시스템
 
-- 개인화된 자기소개서 작성 및 관리
+- 개인화된 자소설 작성 및 관리
 - 사진 업로드 (최대 6장)
 - 관심사 태그 시스템
 - 실시간 검색 및 필터링
@@ -94,7 +94,7 @@ yarn dev
 ### self_introductions 테이블
 
 - 사용자 기본 정보 (이름, 나이, 성별, 거주지)
-- 자기소개서 내용 (제목, 내용, 관심사 태그)
+- 자소설 내용 (제목, 내용, 관심사 태그)
 - 사진 업로드 및 통계 (좋아요, 조회수)
 
 ### super_date_requests 테이블
@@ -143,8 +143,8 @@ yarn dev
 ## 📱 페이지 구조
 
 - `/` - 홈페이지
-- `/introductions` - 자기소개서 목록
-- `/introductions/write` - 자기소개서 작성
+- `/introductions` - 자소설 목록
+- `/introductions/write` - 자소설 작성
 - `/super-date` - 슈퍼 데이트 신청
 - `/daldalChat` - 달달톡 (익명 채팅)
 - `/profile` - 내 정보 (로그인 필요)
@@ -157,16 +157,16 @@ yarn dev
 - `LoginModal.tsx` - 로그인 모달
 - `SignupModal.tsx` - 회원가입 모달
 - `AuthContext.tsx` - 인증 상태 관리
-- `SelfIntroductionForm.tsx` - 자기소개서 작성 폼
+- `SelfIntroductionForm.tsx` - 자소설 작성 폼
 
 ## 🔧 API 함수
 
-### 자기소개서 관련
+### 자소설 관련
 
-- `selfIntroductionAPI.getAll()` - 모든 자기소개서 조회
-- `selfIntroductionAPI.create()` - 자기소개서 생성
-- `selfIntroductionAPI.update()` - 자기소개서 수정
-- `selfIntroductionAPI.delete()` - 자기소개서 삭제
+- `selfIntroductionAPI.getAll()` - 모든 자소설 조회
+- `selfIntroductionAPI.create()` - 자소설 생성
+- `selfIntroductionAPI.update()` - 자소설 수정
+- `selfIntroductionAPI.delete()` - 자소설 삭제
 
 ### 슈퍼 데이트 관련
 

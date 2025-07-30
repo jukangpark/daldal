@@ -1,6 +1,6 @@
 -- Supabase 데이터베이스 스키마
 
--- 자기소개서 테이블
+-- 자소설 테이블
 CREATE TABLE IF NOT EXISTS self_introductions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -39,30 +39,30 @@ CREATE TABLE IF NOT EXISTS super_date_matches (
 
 
 -- 기존 정책 삭제 (있다면)
-DROP POLICY IF EXISTS "자기소개서 읽기 정책" ON self_introductions;
-DROP POLICY IF EXISTS "자기소개서 작성 정책" ON self_introductions;
-DROP POLICY IF EXISTS "자기소개서 수정 정책" ON self_introductions;
-DROP POLICY IF EXISTS "자기소개서 삭제 정책" ON self_introductions;
+DROP POLICY IF EXISTS "자소설 읽기 정책" ON self_introductions;
+DROP POLICY IF EXISTS "자소설 작성 정책" ON self_introductions;
+DROP POLICY IF EXISTS "자소설 수정 정책" ON self_introductions;
+DROP POLICY IF EXISTS "자소설 삭제 정책" ON self_introductions;
 DROP POLICY IF EXISTS "super_date_votes_select_policy" ON super_date_votes;
 DROP POLICY IF EXISTS "super_date_votes_insert_policy" ON super_date_votes;
 DROP POLICY IF EXISTS "super_date_votes_delete_policy" ON super_date_votes;
 DROP POLICY IF EXISTS "super_date_matches_select_policy" ON super_date_matches;
 DROP POLICY IF EXISTS "super_date_matches_insert_policy" ON super_date_matches;
 
--- 자기소개서 RLS 정책
--- 모든 사용자가 자기소개서를 읽을 수 있음
+-- 자소설 RLS 정책
+-- 모든 사용자가 자소설을 읽을 수 있음
 CREATE POLICY "self_introductions_select_policy" ON self_introductions
   FOR SELECT USING (true);
 
--- 로그인한 사용자만 자기소개서를 작성할 수 있음
+-- 로그인한 사용자만 자소설을 작성할 수 있음
 CREATE POLICY "self_introductions_insert_policy" ON self_introductions
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- 사용자는 자신의 자기소개서만 수정할 수 있음
+-- 사용자는 자신의 자소설만 수정할 수 있음
 CREATE POLICY "self_introductions_update_policy" ON self_introductions
   FOR UPDATE USING (auth.uid() = user_id);
 
--- 사용자는 자신의 자기소개서만 삭제할 수 있음
+-- 사용자는 자신의 자소설만 삭제할 수 있음
 CREATE POLICY "self_introductions_delete_policy" ON self_introductions
   FOR DELETE USING (auth.uid() = user_id);
 

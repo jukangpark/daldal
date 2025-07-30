@@ -98,17 +98,17 @@ export default function HonorPage() {
     loadIntroductions();
   }, []);
 
-  // 자기소개서 데이터 로드
+  // 자소설 데이터 로드
   const loadIntroductions = async () => {
     try {
       const { data, error } = await selfIntroductionAPI.getAll();
       if (error) {
-        console.error("자기소개서 로드 오류:", error);
+        console.error("자소설 로드 오류:", error);
       } else {
         setIntroductions(data || []);
       }
     } catch (err) {
-      console.error("자기소개서 로드 오류:", err);
+      console.error("자소설 로드 오류:", err);
     }
   };
 
@@ -143,7 +143,7 @@ export default function HonorPage() {
     const categoryData = categoryInfo[category as keyof typeof categoryInfo];
     const Icon = categoryData.icon;
 
-    // 해당 사용자의 자기소개서 찾기
+    // 해당 사용자의 자소설 찾기
     const userIntroduction = introductions.find(
       (intro) => intro.user_id === result.user_id
     );
@@ -226,7 +226,7 @@ export default function HonorPage() {
 
               {userIntroduction && (
                 <span className="text-xs text-primary-600 dark:text-primary-400">
-                  자기소개서 보기 →
+                  자소설 보기 →
                 </span>
               )}
             </div>

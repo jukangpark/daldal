@@ -68,7 +68,7 @@ export default function HomePage() {
               href="/introductions"
               className="inline-flex items-center px-8 py-4 text-lg font-semibold text-gray-700 bg-white rounded-full border-2 border-gray-200 shadow-lg transition-all duration-300 transform group dark:text-white dark:bg-gray-800 hover:shadow-xl hover:scale-105 dark:border-gray-600"
             >
-              자기소개서 보기
+              자소설 보기
               <Users className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
             </Link>
           </div>
@@ -93,9 +93,8 @@ export default function HomePage() {
                     익명 투표 시스템
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    자기소개서를 작성하고 마음에 드는 상대에게 익명으로 투표할
-                    수 있습니다. 2명에게만 투표 가능하며, 중복 투표는
-                    불가합니다.
+                    자소설을 작성하고 마음에 드는 상대에게 익명으로 투표할 수
+                    있습니다. 2명에게만 투표 가능하며, 중복 투표는 불가합니다.
                   </p>
                 </div>
               </div>
@@ -137,7 +136,7 @@ export default function HomePage() {
               <ul className="space-y-3 text-gray-600 dark:text-gray-300">
                 <li className="flex items-center">
                   <div className="mr-3 w-2 h-2 rounded-full bg-primary-600"></div>
-                  자기소개서 작성한 사용자에게만 투표 가능
+                  자소설 작성한 사용자에게만 투표 가능
                 </li>
                 <li className="flex items-center">
                   <div className="mr-3 w-2 h-2 rounded-full bg-primary-600"></div>
@@ -361,10 +360,10 @@ export default function HomePage() {
                 <span className="text-2xl font-bold text-primary-600">1</span>
               </div>
               <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-                자기소개서 작성
+                자소설 작성
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                나만의 특별한 자기소개서를 작성하여 내면의 매력을 어필하세요
+                나만의 특별한 자소설을 작성하여 내면의 매력을 어필하세요
               </p>
             </div>
 

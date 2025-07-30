@@ -22,6 +22,7 @@ import {
   Users,
   Camera,
   Trophy,
+  Gift,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -39,58 +40,8 @@ const Navigation = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  // 로딩 중일 때는 인증 버튼만 스켈레톤으로 처리
-  const renderAuthButtons = () => {
-    if (authLoading) {
-      return (
-        <div className="flex items-center space-x-2">
-          {/* 사용자 이름 스켈레톤 */}
-          <div className="text-sm">
-            <div className="w-24 h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-600"></div>
-          </div>
-          {/* 로그아웃 버튼 스켈레톤 */}
-          <div className="flex items-center px-3 py-2 text-sm font-medium rounded-md">
-            <div className="w-16 h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-600"></div>
-          </div>
-        </div>
-      );
-    }
-
-    if (user) {
-      return (
-        <div className="flex items-center space-x-2">
-          <Link
-            href="/profile"
-            className="text-sm text-gray-700 truncate transition-colors duration-200 cursor-pointer dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 max-w-24"
-          >
-            {user.user_metadata?.name || user.email}님
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md transition-colors duration-200 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <LogOut className="mr-2 w-4 h-4" />
-            로그아웃
-          </button>
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setShowLoginModal(true)}
-            className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md transition-colors duration-200 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <LogIn className="mr-2 w-4 h-4" />
-            로그인
-          </button>
-        </div>
-      );
-    }
-  };
-
   const navItems = [
-    { href: "/super-date", label: "이벤트", icon: Heart },
+    { href: "/super-date", label: "이벤트", icon: Gift },
     { href: "/introductions", label: "자소설 목록", icon: FileText },
     { href: "/rules", label: "모임회칙", icon: BookOpen },
     {
@@ -151,9 +102,9 @@ const Navigation = () => {
   return (
     <nav className="bg-white border-b border-gray-200 shadow-lg transition-colors duration-200 dark:bg-gray-800 dark:border-gray-700">
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex items-center h-16">
           {/* Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center mr-8">
             <Link href="/" className="flex flex-shrink-0 items-center">
               <Image
                 src="/icon.svg"
@@ -168,8 +119,8 @@ const Navigation = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden items-center space-x-8 md:flex">
+          {/* Desktop Navigation - Left Side */}
+          <div className="hidden flex-1 items-center space-x-6 lg:flex">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -179,13 +130,15 @@ const Navigation = () => {
                   onClick={(e) => handleNavItemClick(item, e)}
                   className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                     isActive(item.href)
-                      ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20"
+                      ? "text-white bg-primary-600 dark:text-white dark:bg-primary-600"
                       : "text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                   }`}
                   title={item.label}
                 >
                   <Icon className="w-4 h-4 lg:mr-2" />
-                  <span className="hidden lg:inline">{item.label}</span>
+                  <span className="hidden whitespace-nowrap lg:inline">
+                    {item.label}
+                  </span>
                 </Link>
               );
             })}
@@ -197,12 +150,14 @@ const Navigation = () => {
                 className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                   pathname.startsWith("/daldalChat") ||
                   pathname.startsWith("/daldalstagram")
-                    ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20"
+                    ? "text-white bg-primary-600 dark:text-white dark:bg-primary-600"
                     : "text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                 }`}
               >
                 <Users className="w-4 h-4 lg:mr-2" />
-                <span className="hidden lg:inline">커뮤니티</span>
+                <span className="hidden whitespace-nowrap lg:inline">
+                  커뮤니티
+                </span>
                 <ChevronDown className="ml-1 w-4 h-4" />
               </button>
 
@@ -220,7 +175,7 @@ const Navigation = () => {
                         }}
                         className={`flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
                           isActive(item.href)
-                            ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20"
+                            ? "text-white bg-primary-600 dark:text-white dark:bg-primary-600"
                             : "text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                         }`}
                       >
@@ -232,13 +187,23 @@ const Navigation = () => {
                 </div>
               )}
             </div>
+          </div>
 
+          {/* Desktop Navigation - Right Side */}
+          <div className="hidden items-center space-x-4 lg:flex">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="flex justify-center items-center w-10 h-10 text-gray-700 rounded-md transition-colors duration-200 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+              disabled={themeLoading}
+              className={`flex justify-center items-center w-10 h-10 rounded-md transition-colors duration-200 ${
+                themeLoading
+                  ? "text-gray-400 bg-gray-100 cursor-not-allowed dark:bg-gray-700"
+                  : "text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+              }`}
             >
-              {theme === "light" ? (
+              {themeLoading ? (
+                <div className="w-5 h-5 bg-gray-300 rounded animate-pulse dark:bg-gray-600"></div>
+              ) : theme === "light" ? (
                 <Moon className="w-5 h-5" />
               ) : (
                 <Sun className="w-5 h-5" />
@@ -246,36 +211,55 @@ const Navigation = () => {
             </button>
 
             {/* Auth Buttons */}
-            <div className="hidden lg:block">{renderAuthButtons()}</div>
-            <div className="lg:hidden">
-              {user ? (
-                <Link
-                  href="/profile"
-                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md transition-colors duration-200 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  title={user.user_metadata?.name || user.email}
-                >
-                  <User className="w-4 h-4" />
-                </Link>
+            <div className="flex items-center space-x-2 min-w-[200px]">
+              {authLoading ? (
+                <>
+                  <div className="w-24 h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-600"></div>
+                  <div className="w-16 h-8 bg-gray-200 rounded animate-pulse dark:bg-gray-600"></div>
+                </>
+              ) : user ? (
+                <>
+                  <Link
+                    href="/profile"
+                    className="text-sm text-gray-700 truncate whitespace-nowrap transition-colors duration-200 cursor-pointer dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 max-w-24"
+                  >
+                    {user.user_metadata?.name || user.email}님
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 whitespace-nowrap rounded-md transition-colors duration-200 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    <LogOut className="mr-2 w-4 h-4" />
+                    로그아웃
+                  </button>
+                </>
               ) : (
                 <button
                   onClick={() => setShowLoginModal(true)}
-                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md transition-colors duration-200 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  title="로그인"
+                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 whitespace-nowrap rounded-md transition-colors duration-200 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  <LogIn className="w-4 h-4" />
+                  <LogIn className="mr-2 w-4 h-4" />
+                  로그인
                 </button>
               )}
             </div>
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex items-center space-x-2 lg:hidden">
+          <div className="flex items-center ml-auto space-x-2 lg:hidden">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="flex flex-shrink-0 justify-center items-center w-10 h-10 text-gray-700 rounded-md transition-colors duration-200 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+              disabled={themeLoading}
+              className={`flex flex-shrink-0 justify-center items-center w-10 h-10 rounded-md transition-colors duration-200 ${
+                themeLoading
+                  ? "text-gray-400 bg-gray-100 cursor-not-allowed dark:bg-gray-700"
+                  : "text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+              }`}
             >
-              {theme === "light" ? (
+              {themeLoading ? (
+                <div className="w-5 h-5 bg-gray-300 rounded animate-pulse dark:bg-gray-600"></div>
+              ) : theme === "light" ? (
                 <Moon className="w-5 h-5" />
               ) : (
                 <Sun className="w-5 h-5" />
@@ -311,7 +295,7 @@ const Navigation = () => {
                   }}
                   className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
                     isActive(item.href)
-                      ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20"
+                      ? "text-white bg-primary-600 dark:text-white dark:bg-primary-600"
                       : "text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                   }`}
                 >
@@ -340,7 +324,7 @@ const Navigation = () => {
                   }}
                   className={`flex items-center px-6 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
                     isActive(item.href)
-                      ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20"
+                      ? "text-white bg-primary-600 dark:text-white dark:bg-primary-600"
                       : "text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                   }`}
                 >

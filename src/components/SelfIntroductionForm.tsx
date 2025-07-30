@@ -99,7 +99,7 @@ export default function SelfIntroductionForm({
       <div className="card">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {mode === "create" ? "자기소개서 작성" : "자기소개서 수정"}
+            {mode === "create" ? "자소설 작성" : "자소설 수정"}
           </h2>
           <button
             onClick={onCancel}
@@ -119,7 +119,7 @@ export default function SelfIntroductionForm({
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="자기소개서 제목을 입력하세요"
+              placeholder="자소설 제목을 입력하세요"
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               required
             />
@@ -133,7 +133,7 @@ export default function SelfIntroductionForm({
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="자기소개서 내용을 입력하세요"
+              placeholder="자소설 내용을 입력하세요"
               rows={8}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
               required
@@ -249,8 +249,8 @@ export default function SelfIntroductionForm({
             />
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {mode === "create"
-                ? "이 비밀번호로 나중에 자기소개서를 수정할 수 있습니다."
-                : "자기소개서 수정을 위해 비밀번호를 입력해주세요."}
+                ? "이 비밀번호로 나중에 자소설을 수정할 수 있습니다."
+                : "자소설 수정을 위해 비밀번호를 입력해주세요."}
             </p>
           </div>
 

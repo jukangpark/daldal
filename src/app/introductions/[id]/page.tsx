@@ -49,18 +49,18 @@ export default function IntroductionDetailPage() {
         );
 
         if (error) {
-          console.error("자기소개서 로드 오류:", error);
-          setError("자기소개서를 불러오는 중 오류가 발생했습니다.");
+          console.error("자소설 로드 오류:", error);
+          setError("자소설을 불러오는 중 오류가 발생했습니다.");
         } else if (data) {
           setIntroduction(data);
           // 조회수 증가
           await selfIntroductionAPI.incrementViews(params.id as string);
         } else {
-          setError("자기소개서를 찾을 수 없습니다.");
+          setError("자소설을 찾을 수 없습니다.");
         }
       } catch (err) {
-        console.error("자기소개서 로드 오류:", err);
-        setError("자기소개서를 불러오는 중 오류가 발생했습니다.");
+        console.error("자소설 로드 오류:", err);
+        setError("자소설을 불러오는 중 오류가 발생했습니다.");
       } finally {
         setLoading(false);
       }
@@ -220,7 +220,7 @@ export default function IntroductionDetailPage() {
           <div className="flex items-center space-x-3">
             <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
             <span className="text-lg text-gray-600 dark:text-gray-300">
-              자기소개서를 불러오는 중...
+              자소설을 불러오는 중...
             </span>
           </div>
         </div>
@@ -258,7 +258,7 @@ export default function IntroductionDetailPage() {
         <div className="w-20"></div> {/* 균형을 위한 빈 공간 */}
       </div>
 
-      {/* 자기소개서 내용 */}
+      {/* 자소설 내용 */}
       <div className="card">
         {/* 제목 및 기본 정보 */}
         <div className="mb-8">

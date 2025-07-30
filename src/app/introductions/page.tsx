@@ -48,19 +48,19 @@ export default function IntroductionsPage() {
   const [hasExistingIntroduction, setHasExistingIntroduction] =
     useState<boolean>(false);
 
-  // 자기소개서 데이터 로드
+  // 자소설 데이터 로드
   useEffect(() => {
     const loadIntroductions = async () => {
       try {
         setLoading(true);
         const { data, error } = await selfIntroductionAPI.getAll();
         if (error) {
-          console.error("자기소개서 로드 오류:", error);
-          setError("자기소개서를 불러오는 중 오류가 발생했습니다.");
+          console.error("자소설 로드 오류:", error);
+          setError("자소설을 불러오는 중 오류가 발생했습니다.");
         } else {
           setIntroductions(data || []);
 
-          // 현재 사용자가 이미 자기소개서를 작성했는지 확인
+          // 현재 사용자가 이미 자소설을 작성했는지 확인
           if (user && data) {
             const existingIntro = data.find(
               (intro) => intro.user_id === user.id
@@ -69,8 +69,8 @@ export default function IntroductionsPage() {
           }
         }
       } catch (err) {
-        console.error("자기소개서 로드 오류:", err);
-        setError("자기소개서를 불러오는 중 오류가 발생했습니다.");
+        console.error("자소설 로드 오류:", err);
+        setError("자소설을 불러오는 중 오류가 발생했습니다.");
       } finally {
         setLoading(false);
       }
@@ -254,10 +254,10 @@ export default function IntroductionsPage() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 text-center">
           <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">
-            자기소개서 목록
+            자소설 목록
           </h1>
           <p className="mx-auto max-w-2xl text-xl text-gray-600 dark:text-gray-300">
-            다른 사람들의 자기소개서를 읽고 진정한 만남의 기회를 찾아보세요
+            다른 사람들의 자소설을 읽고 진정한 만남의 기회를 찾아보세요
           </p>
         </div>
 
@@ -265,7 +265,7 @@ export default function IntroductionsPage() {
           <div className="flex items-center space-x-3">
             <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
             <span className="text-lg text-gray-600 dark:text-gray-300">
-              자기소개서를 불러오는 중...
+              자소설을 불러오는 중...
             </span>
           </div>
         </div>
@@ -278,10 +278,10 @@ export default function IntroductionsPage() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 text-center">
           <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">
-            자기소개서 목록
+            자소설 목록
           </h1>
           <p className="mx-auto max-w-2xl text-xl text-gray-600 dark:text-gray-300">
-            다른 사람들의 자기소개서를 읽고 진정한 만남의 기회를 찾아보세요
+            다른 사람들의 자소설을 읽고 진정한 만남의 기회를 찾아보세요
           </p>
         </div>
 
@@ -302,13 +302,13 @@ export default function IntroductionsPage() {
     <div className="mx-auto max-w-6xl">
       <div className="mb-12 text-center">
         <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">
-          자기소개서 목록
+          자소설 목록
         </h1>
         <p className="mx-auto max-w-2xl text-xl text-gray-600 dark:text-gray-300">
-          다른 사람들의 자기소개서를 읽고 진정한 만남의 기회를 찾아보세요
+          다른 사람들의 자소설을 읽고 진정한 만남의 기회를 찾아보세요
         </p>
 
-        {/* 자기소개서 작성하기 버튼 */}
+        {/* 자소설 작성하기 버튼 */}
         <div className="mt-8">
           {user ? (
             hasExistingIntroduction ? (
@@ -317,7 +317,7 @@ export default function IntroductionsPage() {
                 className="inline-flex items-center px-6 py-3 font-medium text-gray-400 bg-gray-200 rounded-lg shadow-lg cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"
               >
                 <Plus className="mr-2 w-5 h-5" />
-                이미 작성된 자기소개서가 있습니다
+                이미 작성된 자소설이 있습니다
               </button>
             ) : (
               <button
@@ -325,7 +325,7 @@ export default function IntroductionsPage() {
                 className="inline-flex items-center px-6 py-3 font-medium text-white rounded-lg shadow-lg transition-colors duration-200 bg-primary-600 hover:bg-primary-700 hover:shadow-xl"
               >
                 <Plus className="mr-2 w-5 h-5" />
-                자기소개서 작성하기
+                자소설 작성하기
               </button>
             )
           ) : (
@@ -334,7 +334,7 @@ export default function IntroductionsPage() {
               className="inline-flex items-center px-6 py-3 font-medium text-white rounded-lg shadow-lg transition-colors duration-200 bg-primary-600 hover:bg-primary-700 hover:shadow-xl"
             >
               <Plus className="mr-2 w-5 h-5" />
-              로그인하고 자기소개서 작성하기
+              로그인하고 자소설 작성하기
             </button>
           )}
         </div>
@@ -608,9 +608,7 @@ export default function IntroductionsPage() {
       {/* 결과 통계 */}
       <div className="p-4 mb-6 bg-gray-50 rounded-lg">
         <div className="flex justify-between items-center text-sm text-gray-600">
-          <span>
-            총 {filteredIntroductions.length}개의 자기소개서를 찾았습니다
-          </span>
+          <span>총 {filteredIntroductions.length}개의 자소설을 찾았습니다</span>
           <span>
             {selectedGender === "all"
               ? `전체 ${genderStats.total}개`
@@ -621,7 +619,7 @@ export default function IntroductionsPage() {
         </div>
       </div>
 
-      {/* 자기소개서 목록 */}
+      {/* 자소설 목록 */}
       <div className="grid gap-6">
         {filteredIntroductions.map((intro, index) => (
           <div
@@ -728,7 +726,7 @@ export default function IntroductionsPage() {
       {filteredIntroductions.length === 0 && (
         <div className="py-12 text-center">
           <p className="text-lg text-gray-500">
-            검색 조건에 맞는 자기소개서가 없습니다.
+            검색 조건에 맞는 자소설이 없습니다.
           </p>
         </div>
       )}

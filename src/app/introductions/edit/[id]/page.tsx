@@ -45,7 +45,7 @@ export default function EditIntroductionPage() {
   const [submitAbortController, setSubmitAbortController] =
     useState<AbortController | null>(null);
 
-  // 기존 자기소개서 데이터 로드
+  // 기존 자소설 데이터 로드
   useEffect(() => {
     const loadExistingData = async () => {
       if (!params.id || !user) {
@@ -61,19 +61,19 @@ export default function EditIntroductionPage() {
         );
 
         if (error) {
-          console.error("자기소개서 로드 오류:", error);
-          setError("자기소개서를 불러오는 중 오류가 발생했습니다.");
+          console.error("자소설 로드 오류:", error);
+          setError("자소설을 불러오는 중 오류가 발생했습니다.");
           return;
         }
 
         if (!data) {
-          setError("자기소개서를 찾을 수 없습니다.");
+          setError("자소설을 찾을 수 없습니다.");
           return;
         }
 
-        // 본인의 자기소개서인지 확인
+        // 본인의 자소설인지 확인
         if (data.user_id !== user.id) {
-          setError("본인의 자기소개서만 수정할 수 있습니다.");
+          setError("본인의 자소설만 수정할 수 있습니다.");
           return;
         }
 
@@ -97,8 +97,8 @@ export default function EditIntroductionPage() {
           special_skills: data.special_skills || "",
         });
       } catch (err) {
-        console.error("자기소개서 로드 오류:", err);
-        setError("자기소개서를 불러오는 중 오류가 발생했습니다.");
+        console.error("자소설 로드 오류:", err);
+        setError("자소설을 불러오는 중 오류가 발생했습니다.");
       } finally {
         setIsLoading(false);
       }
@@ -224,10 +224,10 @@ export default function EditIntroductionPage() {
       );
 
       if (error) {
-        console.error("자기소개서 수정 오류:", error);
-        alert("자기소개서 수정 중 오류가 발생했습니다.");
+        console.error("자소설 수정 오류:", error);
+        alert("자소설 수정 중 오류가 발생했습니다.");
       } else {
-        alert("자기소개서가 성공적으로 수정되었습니다!");
+        alert("자소설이 성공적으로 수정되었습니다!");
         router.push("/profile");
       }
     } catch (error) {
@@ -237,8 +237,8 @@ export default function EditIntroductionPage() {
         return;
       }
 
-      console.error("자기소개서 수정 오류:", error);
-      alert("자기소개서 수정 중 오류가 발생했습니다.");
+      console.error("자소설 수정 오류:", error);
+      alert("자소설 수정 중 오류가 발생했습니다.");
     } finally {
       setIsSubmitting(false);
       setSubmitAbortController(null);
@@ -252,7 +252,7 @@ export default function EditIntroductionPage() {
           <div className="flex items-center space-x-3">
             <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
             <span className="text-lg text-gray-600 dark:text-gray-300">
-              자기소개서를 불러오는 중...
+              자소설을 불러오는 중...
             </span>
           </div>
         </div>
@@ -288,7 +288,7 @@ export default function EditIntroductionPage() {
           뒤로가기
         </button>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          자기소개서 수정
+          자소설 수정
         </h1>
         <div className="w-20"></div> {/* 균형을 위한 빈 공간 */}
       </div>
@@ -304,7 +304,7 @@ export default function EditIntroductionPage() {
           <div className="grid gap-6 md:grid-cols-2">
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
-                자기소개서 제목 *
+                자소설 제목 *
               </label>
               <input
                 type="text"

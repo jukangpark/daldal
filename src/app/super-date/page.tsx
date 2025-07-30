@@ -10,137 +10,20 @@ import {
   Users,
   ArrowRight,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import {
-  selfIntroductionAPI,
-  superDateAPI,
-  SelfIntroduction,
-} from "@/lib/supabase";
 
 export default function SuperDatePage() {
-  const { user } = useAuth();
   const router = useRouter();
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
-  const [message, setMessage] = useState("");
-  const [selectedGender, setSelectedGender] = useState<
-    "all" | "male" | "female"
-  >("all");
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-  const [introductions, setIntroductions] = useState<SelfIntroduction[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [remainingRequests, setRemainingRequests] = useState<number>(2);
   const [animateIn, setAnimateIn] = useState(false);
 
-  // 자기소개서 데이터 로드
   useEffect(() => {
-    const loadIntroductions = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await selfIntroductionAPI.getAll();
-        if (error) {
-          console.error("자기소개서 로드 오류:", error);
-          setError("자기소개서를 불러오는 중 오류가 발생했습니다.");
-        } else {
-          setIntroductions(data || []);
-        }
-      } catch (err) {
-        console.error("자기소개서 로드 오류:", err);
-        setError("자기소개서를 불러오는 중 오류가 발생했습니다.");
-      } finally {
-        setLoading(false);
-        // 로딩 완료 후 애니메이션 시작
-        setTimeout(() => setAnimateIn(true), 100);
-      }
-    };
+    // 페이지 로드 후 애니메이션 시작
+    const timer = setTimeout(() => {
+      setAnimateIn(true);
+    }, 100);
 
-    loadIntroductions();
+    return () => clearTimeout(timer);
   }, []);
-
-  const handleSuperDateRequest = async () => {
-    if (!selectedUser) {
-      alert("상대방을 선택해주세요.");
-      return;
-    }
-
-    if (!message.trim()) {
-      alert("메시지를 입력해주세요.");
-      return;
-    }
-
-    if (remainingRequests <= 0) {
-      alert("슈퍼 데이트 신청은 하루에 2개까지만 가능합니다.");
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const { data, error } = await superDateAPI.create({
-        target_id: selectedUser,
-        target_name:
-          introductions.find((i) => i.user_id === selectedUser)?.user_name ||
-          "익명",
-      });
-
-      if (error) {
-        console.error("슈퍼 데이트 신청 오류:", error);
-        alert("슈퍼 데이트 신청 중 오류가 발생했습니다.");
-      } else {
-        setRemainingRequests((prev) => Math.max(0, prev - 1));
-        alert(
-          "슈퍼 데이트 신청이 완료되었습니다! CGV 기프티콘 이벤트에 참여하세요!"
-        );
-        setSelectedUser(null);
-        setMessage("");
-      }
-    } catch (error) {
-      console.error("슈퍼 데이트 신청 오류:", error);
-      alert("슈퍼 데이트 신청 중 오류가 발생했습니다.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const toggleInterest = (interest: string) => {
-    setSelectedInterests((prev) =>
-      prev.includes(interest)
-        ? prev.filter((i) => i !== interest)
-        : [...prev, interest]
-    );
-  };
-
-  if (loading) {
-    return (
-      <div className="mx-auto max-w-6xl">
-        <div className="flex justify-center items-center py-20">
-          <div className="flex items-center space-x-3">
-            <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
-            <span className="text-lg text-gray-600 dark:text-gray-300">
-              이벤트 정보를 불러오는 중...
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="mx-auto max-w-6xl">
-        <div className="py-20 text-center">
-          <p className="mb-4 text-lg text-red-600 dark:text-red-400">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-3 text-white rounded-lg transition-colors bg-primary-600 hover:bg-primary-700"
-          >
-            다시 시도
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -186,7 +69,7 @@ export default function SuperDatePage() {
             서로를 선택한 첫 번째 커플에게
             <br />
             <div className="font-bold text-pink-600 dark:text-pink-400">
-              🎬 CGV 커플 콤보 기프티콘 🎬
+              🎬 CGV 커플 콤보 기프티콘 🍿
             </div>
             을 선물로 드립니다!
           </div>
@@ -248,7 +131,7 @@ export default function SuperDatePage() {
           }`}
         >
           <h3 className="mb-4 text-xl font-bold text-center text-gray-900 dark:text-white">
-            🍿 CGV 커플 콤보 구성 🍿
+            🎬 CGV 커플 콤보 구성 🍿
           </h3>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
@@ -313,11 +196,11 @@ export default function SuperDatePage() {
           </p>
           <div className="inline-flex items-center px-4 py-2 text-sm font-medium text-pink-700 bg-pink-100 rounded-full dark:bg-pink-900/30 dark:text-pink-300">
             <Gift className="mr-2 w-4 h-4" />
-            슈퍼 데이트 신청권: {remainingRequests}개 남음
+            슈퍼 데이트 신청권: 2개
           </div>
         </div>
 
-        {/* 자기소개서 목록으로 이동 버튼 */}
+        {/* 자소설 목록으로 이동 버튼 */}
         <div className="mx-auto max-w-2xl text-center">
           <button
             onClick={() => router.push("/introductions")}
@@ -328,8 +211,7 @@ export default function SuperDatePage() {
             <ArrowRight className="ml-2 w-6 h-6" />
           </button>
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-            자기소개서 목록에서 마음에 드는 상대방을 찾아 슈퍼 데이트를
-            신청하세요!
+            자소설 목록에서 마음에 드는 상대방을 찾아 슈퍼 데이트를 신청하세요!
           </p>
         </div>
       </div>
@@ -418,9 +300,7 @@ export default function SuperDatePage() {
           <li>• 자신에게는 신청할 수 없습니다</li>
           <li>• 기프티콘은 첫 번째 매칭 커플에게만 제공됩니다</li>
           <li>• 매칭 후 개인정보를 통해 기프티콘을 전달합니다</li>
-          <li>
-            • 로그인하고 자기소개서 작성한 유저만 슈퍼 데이트 신청 가능합니다
-          </li>
+          <li>• 로그인하고 자소설 작성한 유저만 슈퍼 데이트 신청 가능합니다</li>
         </ul>
       </div>
     </div>

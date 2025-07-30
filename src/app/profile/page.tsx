@@ -79,7 +79,7 @@ export default function ProfilePage() {
   // 사진 슬라이더 상태
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
-  // 로그인 상태 확인 및 자기소개서 데이터 로드
+  // 로그인 상태 확인 및 자소설 데이터 로드
   useEffect(() => {
     if (!loading && !user) {
       router.push("/");
@@ -93,33 +93,33 @@ export default function ProfilePage() {
     }
   }, [user, loading, router]);
 
-  // 자기소개서 데이터 로드
+  // 자소설 데이터 로드
   const loadSelfIntroduction = async () => {
     try {
       setLoadingSelfIntro(true);
 
-      // 디버깅: 모든 자기소개서 확인
+      // 디버깅: 모든 자소설 확인
       const { data: allIntros, error: allError } =
         await selfIntroductionAPI.getAllByUserId(user!.id);
 
       const { data, error } = await selfIntroductionAPI.getByUserId(user!.id);
 
       if (error) {
-        console.error("자기소개서 로드 오류:", error);
-        // 자기소개서가 없는 경우는 에러가 아님
+        console.error("자소설 로드 오류:", error);
+        // 자소설이 없는 경우는 에러가 아님
         if (error.code === "PGRST116") {
           setSelfIntro(null);
           setError(null);
         } else {
-          setError("자기소개서를 불러오는 중 오류가 발생했습니다.");
+          setError("자소설을 불러오는 중 오류가 발생했습니다.");
         }
       } else {
         setSelfIntro(data);
         setError(null);
       }
     } catch (err) {
-      console.error("자기소개서 로드 오류:", err);
-      setError("자기소개서를 불러오는 중 오류가 발생했습니다.");
+      console.error("자소설 로드 오류:", err);
+      setError("자소설을 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoadingSelfIntro(false);
     }
@@ -178,7 +178,7 @@ export default function ProfilePage() {
             introduction:
               "이 사람이 나를 선택했습니다. 슈퍼 데이트 신청을 통해 서로를 알아갈 수 있습니다.", // 기본 메시지
             created_at: receivedRequest.created_at,
-            introduction_id: "", // 자기소개서 ID 숨김
+            introduction_id: "", // 자소설 ID 숨김
           });
         }
       }
@@ -268,7 +268,7 @@ export default function ProfilePage() {
         photo: string;
         introduction: string;
         matched_at: string;
-        introduction_id: string; // 자기소개서 ID 추가
+        introduction_id: string; // 자소설 ID 추가
       }> = [];
 
       for (const sentRequest of sentRequests || []) {
@@ -277,7 +277,7 @@ export default function ProfilePage() {
         );
 
         if (isMatched) {
-          // 매칭된 사람의 자기소개서 정보 가져오기
+          // 매칭된 사람의 자소설 정보 가져오기
           const { data: introData } = await selfIntroductionAPI.getByUserId(
             sentRequest.target_id
           );
@@ -291,7 +291,7 @@ export default function ProfilePage() {
               photo: introData.photos?.[0] || "/default-avatar.png",
               introduction: introData.content,
               matched_at: sentRequest.created_at,
-              introduction_id: introData.id, // 자기소개서 ID 저장
+              introduction_id: introData.id, // 자소설 ID 저장
             });
           }
         }
@@ -329,7 +329,7 @@ export default function ProfilePage() {
         <div className="mb-12 text-center">
           <h1 className="mb-4 text-4xl font-bold text-gray-900">내 정보</h1>
           <p className="text-xl text-gray-600">
-            나의 프로필과 자기소개서를 관리하세요
+            나의 프로필과 자소설을 관리하세요
           </p>
         </div>
 
@@ -378,7 +378,7 @@ export default function ProfilePage() {
     }
   };
 
-  // 자기소개서 삭제 처리
+  // 자소설 삭제 처리
   const handleDelete = async () => {
     if (!deletePassword.trim()) {
       setDeleteError("비밀번호를 입력해주세요.");
@@ -407,7 +407,7 @@ export default function ProfilePage() {
           return;
         }
 
-        // 비밀번호가 맞으면 자기소개서 삭제
+        // 비밀번호가 맞으면 자소설 삭제
         const { error: deleteError } = await selfIntroductionAPI.delete(
           selfIntro!.id
         );
@@ -417,7 +417,7 @@ export default function ProfilePage() {
           return;
         }
 
-        alert("자기소개서가 삭제되었습니다.");
+        alert("자소설이 삭제되었습니다.");
         setSelfIntro(null);
         setShowDeleteModal(false);
         setDeletePassword("");
@@ -437,14 +437,14 @@ export default function ProfilePage() {
           내 정보
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-300">
-          나의 프로필과 자기소개서를 관리하세요
+          나의 프로필과 자소설을 관리하세요
         </p>
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
           로그인된 사용자: {user.user_metadata?.name || user.email}
         </p>
       </div>
 
-      {/* 자기소개서 내용 */}
+      {/* 자소설 내용 */}
       {selfIntro ? (
         <div className="card">
           {/* 제목 및 기본 정보 */}
@@ -718,14 +718,14 @@ export default function ProfilePage() {
         <div className="card">
           <div className="py-12 text-center">
             <p className="mb-4 text-lg text-gray-500 dark:text-gray-300">
-              아직 자기소개서를 작성하지 않았습니다.
+              아직 자소설을 작성하지 않았습니다.
             </p>
             <Link
               href="/introductions/write"
               className="inline-flex items-center btn-primary"
             >
               <Plus className="mr-2 w-4 h-4" />
-              자기소개서 작성하기
+              자소설 작성하기
             </Link>
           </div>
         </div>
@@ -800,7 +800,7 @@ export default function ProfilePage() {
                 아직 나를 선택한 이성이 없습니다
               </p>
               <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">
-                자기소개서를 작성하고 다른 사람들에게 어필해보세요
+                자소설을 작성하고 다른 사람들에게 어필해보세요
               </p>
             </div>
           )}
@@ -919,8 +919,7 @@ export default function ProfilePage() {
                 현재 나와 연결된 이성이 없습니다
               </p>
               <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">
-                자기소개서 목록에서 마음에 드는 상대에게 슈퍼 데이트를
-                신청해보세요
+                자소설 목록에서 마음에 드는 상대에게 슈퍼 데이트를 신청해보세요
               </p>
               <div className="mt-4">
                 <Link
@@ -928,7 +927,7 @@ export default function ProfilePage() {
                   className="inline-flex items-center px-4 py-2 text-white rounded-lg transition-colors bg-primary-600 hover:bg-primary-700"
                 >
                   <User className="mr-2 w-4 h-4" />
-                  자기소개서 목록 보기
+                  자소설 목록 보기
                 </Link>
               </div>
             </div>
@@ -941,10 +940,10 @@ export default function ProfilePage() {
         <div className="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
           <div className="p-6 w-full max-w-md bg-white rounded-lg shadow-xl dark:bg-gray-800">
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              자기소개서 삭제
+              자소설 삭제
             </h3>
             <p className="mb-4 text-gray-600 dark:text-gray-300">
-              자기소개서를 삭제하려면 비밀번호를 입력해주세요.
+              자소설을 삭제하려면 비밀번호를 입력해주세요.
             </p>
 
             <div className="mb-4">

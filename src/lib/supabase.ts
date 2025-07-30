@@ -198,9 +198,9 @@ export const auth = {
   },
 };
 
-// 자기소개서 관련 API 함수들
+// 자소설 관련 API 함수들
 export const selfIntroductionAPI = {
-  // 모든 자기소개서 가져오기
+  // 모든 자소설 가져오기
   async getAll() {
     const { data, error } = await supabase
       .from("self_introductions")
@@ -209,7 +209,7 @@ export const selfIntroductionAPI = {
     return { data, error };
   },
 
-  // 특정 자기소개서 가져오기
+  // 특정 자소설 가져오기
   async getById(id: string) {
     const { data, error } = await supabase
       .from("self_introductions")
@@ -219,7 +219,7 @@ export const selfIntroductionAPI = {
     return { data, error };
   },
 
-  // 사용자의 자기소개서 가져오기 (최신 것 하나만)
+  // 사용자의 자소설 가져오기 (최신 것 하나만)
   async getByUserId(userId: string) {
     const { data, error } = await supabase
       .from("self_introductions")
@@ -231,7 +231,7 @@ export const selfIntroductionAPI = {
     return { data, error };
   },
 
-  // 사용자의 모든 자기소개서 가져오기
+  // 사용자의 모든 자소설 가져오기
   async getAllByUserId(userId: string) {
     const { data, error } = await supabase
       .from("self_introductions")
@@ -241,14 +241,14 @@ export const selfIntroductionAPI = {
     return { data, error };
   },
 
-  // 자기소개서 생성
+  // 자소설 생성
   async create(introductionData: CreateSelfIntroductionData) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) throw new Error("User not authenticated");
 
-    // 기존 자기소개서가 있는지 확인
+    // 기존 자소설이 있는지 확인
     const { data: existingIntro, error: checkError } = await supabase
       .from("self_introductions")
       .select("id")
@@ -256,22 +256,22 @@ export const selfIntroductionAPI = {
       .maybeSingle();
 
     if (checkError) {
-      console.error("기존 자기소개서 확인 오류:", checkError);
+      console.error("기존 자소설 확인 오류:", checkError);
       return { data: null, error: checkError };
     }
 
     if (existingIntro) {
-      // 기존 자기소개서가 있으면 에러 반환
+      // 기존 자소설이 있으면 에러 반환
       return {
         data: null,
         error: {
-          message: "이미 작성된 자기소개서가 존재합니다.",
+          message: "이미 작성된 자소설이 존재합니다.",
           code: "DUPLICATE_INTRO",
         },
       };
     }
 
-    // 기존 자기소개서가 없으면 새로 생성
+    // 기존 자소설이 없으면 새로 생성
     const insertData = {
       ...introductionData,
       likes: 0,
@@ -287,7 +287,7 @@ export const selfIntroductionAPI = {
     return { data, error };
   },
 
-  // 자기소개서 업데이트
+  // 자소설 업데이트
   async upsert(id: string, updates: Partial<CreateSelfIntroductionData>) {
     const {
       data: { user },
@@ -310,7 +310,7 @@ export const selfIntroductionAPI = {
     return { data, error };
   },
 
-  // 자기소개서 삭제
+  // 자소설 삭제
   async delete(id: string) {
     const {
       data: { user },
@@ -321,7 +321,7 @@ export const selfIntroductionAPI = {
       .from("self_introductions")
       .delete()
       .eq("id", id)
-      .eq("user_id", user.id); // 본인의 자기소개서만 삭제 가능하도록 추가 조건
+      .eq("user_id", user.id); // 본인의 자소설만 삭제 가능하도록 추가 조건
     return { error };
   },
 
@@ -843,7 +843,7 @@ export const reactionSpeedAPI = {
 
 // 명예의 전당 투표 API
 export const honorVoteAPI = {
-  // 투표 후보자 목록 가져오기 (자기소개서 작성한 사용자들)
+  // 투표 후보자 목록 가져오기 (자소설 작성한 사용자들)
   async getCandidates(): Promise<{ data: VoteCandidate[] | null; error: any }> {
     const { data, error } = await supabase
       .from("self_introductions")
@@ -855,7 +855,7 @@ export const honorVoteAPI = {
       return { data: null, error };
     }
 
-    // 중복 제거 (같은 사용자의 최신 자기소개서만)
+    // 중복 제거 (같은 사용자의 최신 자소설만)
     const uniqueCandidates = data?.reduce(
       (acc: VoteCandidate[], intro: any) => {
         const existing = acc.find((c) => c.user_id === intro.user_id);

@@ -158,17 +158,17 @@ export default function WriteIntroductionPage() {
       });
 
       if (error) {
-        console.error("자기소개서 작성 오류:", error);
+        console.error("자소설 작성 오류:", error);
 
-        // 중복 자기소개서 에러 처리
+        // 중복 자소설 에러 처리
         if (error.code === "DUPLICATE_INTRO") {
-          alert(error.message || "이미 작성된 자기소개서가 존재합니다.");
+          alert(error.message || "이미 작성된 자소설이 존재합니다.");
           router.push("/profile");
         } else {
-          alert("자기소개서 작성 중 오류가 발생했습니다.");
+          alert("자소설 작성 중 오류가 발생했습니다.");
         }
       } else {
-        alert("자기소개서가 성공적으로 작성되었습니다!");
+        alert("자소설이 성공적으로 작성되었습니다!");
         router.push("/introductions");
       }
     } catch (error) {
@@ -178,8 +178,8 @@ export default function WriteIntroductionPage() {
         return;
       }
 
-      console.error("자기소개서 처리 오류:", error);
-      alert("자기소개서 처리 중 오류가 발생했습니다.");
+      console.error("자소설 처리 오류:", error);
+      alert("자소설 처리 중 오류가 발생했습니다.");
     } finally {
       setIsSubmitting(false);
       setSubmitAbortController(null);
@@ -198,7 +198,7 @@ export default function WriteIntroductionPage() {
           뒤로가기
         </button>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          자기소개서 작성
+          자소설 작성
         </h1>
         <div className="w-20"></div> {/* 균형을 위한 빈 공간 */}
       </div>
@@ -214,7 +214,7 @@ export default function WriteIntroductionPage() {
           <div className="grid gap-6 md:grid-cols-2">
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
-                자기소개서 제목 *
+                자소설 제목 *
               </label>
               <input
                 type="text"
@@ -568,7 +568,7 @@ export default function WriteIntroductionPage() {
             ) : (
               <>
                 <Save className="mr-2 w-4 h-4" />
-                자기소개서 작성 완료
+                자소설 작성 완료
               </>
             )}
           </button>

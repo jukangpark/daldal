@@ -208,9 +208,9 @@ const rules: Rule[] = [
   },
   {
     id: 20,
-    title: "자기소개서 작성",
+    title: "자소설 작성",
     content:
-      "가입 후 1시간 이내 자기소개서를 작성하여야 하며, 이후에도 삭제해서는 안 된다.",
+      "가입 후 1시간 이내 자소설을 작성하여야 하며, 이후에도 삭제해서는 안 된다.",
     category: "join",
     important: true,
     article: "제7조",
