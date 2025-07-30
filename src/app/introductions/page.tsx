@@ -257,7 +257,7 @@ export default function IntroductionsPage() {
             자소설 목록
           </h1>
           <p className="mx-auto max-w-2xl text-xl text-gray-600 dark:text-gray-300">
-            다른 사람들의 자소설을 읽고 진정한 만남의 기회를 찾아보세요
+            자소설을 읽고 슈데권을 신청하세요! 일단 질러 ⭐️
           </p>
         </div>
 
@@ -281,7 +281,7 @@ export default function IntroductionsPage() {
             자소설 목록
           </h1>
           <p className="mx-auto max-w-2xl text-xl text-gray-600 dark:text-gray-300">
-            다른 사람들의 자소설을 읽고 진정한 만남의 기회를 찾아보세요
+            자소설을 읽고 슈데권을 신청하세요! 일단 질러 ⭐️
           </p>
         </div>
 
@@ -305,7 +305,7 @@ export default function IntroductionsPage() {
           자소설 목록
         </h1>
         <p className="mx-auto max-w-2xl text-xl text-gray-600 dark:text-gray-300">
-          다른 사람들의 자소설을 읽고 진정한 만남의 기회를 찾아보세요
+          슈데권을 신청해! 일단 질러 ⭐️
         </p>
 
         {/* 자소설 작성하기 버튼 */}
