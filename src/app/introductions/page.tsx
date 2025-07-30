@@ -623,7 +623,6 @@ export default function IntroductionsPage() {
       {/* 자소설 목록 */}
       <div className="grid gap-6">
         {filteredIntroductions.map((intro, index) => {
-          console.log("intro", intro);
           const userGender = intro?.user_gender || "male";
           const userThumbnail = intro.photos[0] || "";
 
@@ -644,6 +643,7 @@ export default function IntroductionsPage() {
                         userName={intro.user_name}
                         gender={userGender}
                         size="md"
+                        isVVIP={intro.isVVIP}
                       />
                       <span className="text-sm text-white-500 dark:text-white">
                         {intro.user_name}

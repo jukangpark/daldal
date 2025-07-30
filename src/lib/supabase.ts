@@ -59,6 +59,7 @@ export interface SelfIntroduction {
   special_skills?: string;
   created_at: string;
   updated_at: string;
+  isVVIP?: boolean;
 }
 
 export interface CreateSelfIntroductionData {

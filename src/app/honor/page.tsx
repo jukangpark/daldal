@@ -173,6 +173,7 @@ export default function HonorPage() {
               userName={result.user_name}
               gender={userGender}
               size="lg"
+              isVVIP={userIntroduction?.isVVIP}
             />
           </div>
 
