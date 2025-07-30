@@ -23,6 +23,7 @@ import {
 } from "@/lib/supabase";
 import LoginModal from "@/components/LoginModal";
 import SignupModal from "@/components/SignupModal";
+import UserAvatar from "@/components/UserAvatar";
 
 // 카테고리 정보
 const categoryInfo = {
@@ -143,22 +144,7 @@ export default function HonorPage() {
     );
     const profileImage = userIntroduction?.photos?.[0];
 
-    // 성별에 따른 색상 설정
-    const genderColors = {
-      male: {
-        bg: "bg-blue-100 dark:bg-blue-900/30",
-        icon: "text-blue-500 dark:text-blue-400",
-        border: "border-blue-200 dark:border-blue-700",
-      },
-      female: {
-        bg: "bg-pink-100 dark:bg-pink-900/30",
-        icon: "text-pink-500 dark:text-pink-400",
-        border: "border-pink-200 dark:border-pink-700",
-      },
-    };
-
     const userGender = userIntroduction?.user_gender || "male";
-    const genderColor = genderColors[userGender];
 
     return (
       <div
@@ -182,27 +168,12 @@ export default function HonorPage() {
 
           {/* 프로필 아바타 */}
           <div className="flex-shrink-0">
-            <div
-              className={`flex overflow-hidden justify-center items-center w-16 h-16 rounded-full border-2 ${genderColor.bg} ${genderColor.border}`}
-            >
-              {profileImage ? (
-                <img
-                  src={profileImage}
-                  alt={result.user_name}
-                  className="object-cover w-full h-full"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = "none";
-                    target.nextElementSibling?.classList.remove("hidden");
-                  }}
-                />
-              ) : null}
-              <User
-                className={`w-8 h-8 ${genderColor.icon} ${
-                  profileImage ? "hidden" : ""
-                }`}
-              />
-            </div>
+            <UserAvatar
+              imageUrl={profileImage}
+              userName={result.user_name}
+              gender={userGender}
+              size="lg"
+            />
           </div>
 
           {/* 사용자 정보 */}

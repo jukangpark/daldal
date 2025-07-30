@@ -27,6 +27,7 @@ import {
   HonorVote,
   HonorResult,
 } from "@/lib/supabase";
+import UserAvatar from "@/components/UserAvatar";
 
 type VoteCategory =
   | "hot_girl"
@@ -353,16 +354,13 @@ export default function HonorVotePage() {
                         </div>
                         {votedCandidate && (
                           <div className="flex items-center">
-                            <div className="overflow-hidden mr-3 w-12 h-12 bg-gray-200 rounded-full dark:bg-gray-700">
-                              {votedCandidate.profile_image ? (
-                                <img
-                                  src={votedCandidate.profile_image}
-                                  alt={votedCandidate.user_name}
-                                  className="object-cover w-full h-full"
-                                />
-                              ) : (
-                                <User className="p-2 w-full h-full text-gray-400" />
-                              )}
+                            <div className="mr-3">
+                              <UserAvatar
+                                imageUrl={votedCandidate.profile_image}
+                                userName={votedCandidate.user_name}
+                                gender={votedCandidate.user_gender}
+                                size="md"
+                              />
                             </div>
                             <div>
                               <p className="font-medium text-gray-900 dark:text-white">
@@ -403,16 +401,13 @@ export default function HonorVotePage() {
                             className="p-3 w-full text-left rounded-lg border border-gray-200 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <div className="flex items-center">
-                              <div className="overflow-hidden mr-3 w-10 h-10 bg-gray-200 rounded-full dark:bg-gray-700">
-                                {candidate.profile_image ? (
-                                  <img
-                                    src={candidate.profile_image}
-                                    alt={candidate.user_name}
-                                    className="object-cover w-full h-full"
-                                  />
-                                ) : (
-                                  <User className="p-2 w-full h-full text-gray-400" />
-                                )}
+                              <div className="mr-3">
+                                <UserAvatar
+                                  imageUrl={candidate.profile_image}
+                                  userName={candidate.user_name}
+                                  gender={candidate.user_gender}
+                                  size="sm"
+                                />
                               </div>
                               <div className="flex-1">
                                 <p className="font-medium text-gray-900 dark:text-white">

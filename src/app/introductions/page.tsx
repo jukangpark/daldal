@@ -21,6 +21,7 @@ import {
 } from "@/lib/supabase";
 import LoginModal from "@/components/LoginModal";
 import SignupModal from "@/components/SignupModal";
+import UserAvatar from "@/components/UserAvatar";
 
 export default function IntroductionsPage() {
   const { user } = useAuth();
@@ -621,44 +622,91 @@ export default function IntroductionsPage() {
 
       {/* 자소설 목록 */}
       <div className="grid gap-6">
-        {filteredIntroductions.map((intro, index) => (
-          <div
-            key={intro.id}
-            className="transition-shadow cursor-pointer card hover:shadow-lg animate-fade-in-up"
-            style={{ animationDelay: `${index * 0.1}s` }}
-            onClick={() => router.push(`/introductions/${intro.id}`)}
-          >
-            <div className="flex items-start space-x-6">
-              <div className="flex-1">
-                {/* 제목 */}
-                <h3 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">
-                  {intro.title}
-                </h3>
+        {filteredIntroductions.map((intro, index) => {
+          console.log("intro", intro);
+          const userGender = intro?.user_gender || "male";
+          const userThumbnail = intro.photos[0] || "";
 
-                {/* 자기소개 내용 */}
-                <p className="mb-4 text-gray-600 line-clamp-3 dark:text-gray-300">
-                  {intro.content}
-                </p>
-
-                {/* 사용자 정보 및 뱃지들 */}
-                <div className="flex flex-wrap gap-2 justify-between items-center">
-                  <div className="flex flex-wrap gap-2 items-center">
-                    <span className="text-sm text-gray-500 dark:text-gray-300">
-                      {intro.user_name}
-                      <span className="hidden sm:inline">
-                        {" "}
-                        ({intro.user_age}세)
+          return (
+            <div
+              key={intro.id}
+              className="transition-shadow cursor-pointer card hover:shadow-lg animate-fade-in-up"
+              style={{ animationDelay: `${index * 0.1}s` }}
+              onClick={() => router.push(`/introductions/${intro.id}`)}
+            >
+              <div className="flex items-start space-x-6">
+                <div className="flex-1">
+                  {/* 사용자 정보 및 뱃지들 */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex gap-2 items-center">
+                      <UserAvatar
+                        imageUrl={userThumbnail}
+                        userName={intro.user_name}
+                        gender={userGender}
+                        size="md"
+                      />
+                      <span className="text-sm text-white-500 dark:text-white">
+                        {intro.user_name}
+                        <span className="hidden sm:inline">
+                          {" "}
+                          ({intro.user_age})
+                        </span>
                       </span>
-                    </span>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        intro.user_gender === "male"
-                          ? "bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-white"
-                          : "bg-pink-100 text-pink-700 dark:bg-pink-600 dark:text-white"
-                      }`}
-                    >
-                      {intro.user_gender === "male" ? "남성" : "여성"}
-                    </span>
+                    </div>
+
+                    {/* 슈퍼 데이트 버튼 */}
+                    {user && user.id !== intro.user_id && (
+                      <div className="flex gap-2">
+                        {sentRequests.has(intro.user_id) ? (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSuperDateCancel(intro.user_id);
+                            }}
+                            disabled={loadingRequests.has(intro.user_id)}
+                            className="flex items-center px-3 py-1 text-xs font-medium text-red-600 bg-red-100 rounded-full transition-colors hover:bg-red-200 disabled:opacity-50 dark:bg-red-600 dark:text-white dark:hover:bg-red-700"
+                          >
+                            {loadingRequests.has(intro.user_id) ? (
+                              <Loader2 className="mr-1 w-3 h-3 animate-spin" />
+                            ) : (
+                              <X className="mr-1 w-3 h-3" />
+                            )}
+                            신청 취소
+                          </button>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSuperDateRequest(
+                                intro.user_id,
+                                intro.user_name
+                              );
+                            }}
+                            disabled={
+                              loadingRequests.has(intro.user_id) ||
+                              remainingRequests <= 0
+                            }
+                            className={`flex items-center px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                              remainingRequests > 0
+                                ? "text-white bg-primary-600 hover:bg-primary-700"
+                                : "text-gray-400 bg-gray-200 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"
+                            } disabled:opacity-50`}
+                          >
+                            {loadingRequests.has(intro.user_id) ? (
+                              <Loader2 className="mr-1 w-3 h-3 animate-spin" />
+                            ) : (
+                              <Calendar className="mr-1 w-3 h-3" />
+                            )}
+                            {remainingRequests > 0
+                              ? "슈퍼 데이트 신청"
+                              : "신청권 소진"}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-3">
                     {intro.mbti && (
                       <span className="px-2 py-1 text-xs text-purple-700 bg-purple-100 rounded-full dark:bg-purple-600 dark:text-white">
                         {intro.mbti}
@@ -666,61 +714,20 @@ export default function IntroductionsPage() {
                     )}
                   </div>
 
-                  {/* 슈퍼 데이트 버튼 */}
-                  {user && user.id !== intro.user_id && (
-                    <div className="flex gap-2">
-                      {sentRequests.has(intro.user_id) ? (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSuperDateCancel(intro.user_id);
-                          }}
-                          disabled={loadingRequests.has(intro.user_id)}
-                          className="flex items-center px-3 py-1 text-xs font-medium text-red-600 bg-red-100 rounded-full transition-colors hover:bg-red-200 disabled:opacity-50 dark:bg-red-600 dark:text-white dark:hover:bg-red-700"
-                        >
-                          {loadingRequests.has(intro.user_id) ? (
-                            <Loader2 className="mr-1 w-3 h-3 animate-spin" />
-                          ) : (
-                            <X className="mr-1 w-3 h-3" />
-                          )}
-                          신청 취소
-                        </button>
-                      ) : (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSuperDateRequest(
-                              intro.user_id,
-                              intro.user_name
-                            );
-                          }}
-                          disabled={
-                            loadingRequests.has(intro.user_id) ||
-                            remainingRequests <= 0
-                          }
-                          className={`flex items-center px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                            remainingRequests > 0
-                              ? "text-white bg-primary-600 hover:bg-primary-700"
-                              : "text-gray-400 bg-gray-200 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"
-                          } disabled:opacity-50`}
-                        >
-                          {loadingRequests.has(intro.user_id) ? (
-                            <Loader2 className="mr-1 w-3 h-3 animate-spin" />
-                          ) : (
-                            <Calendar className="mr-1 w-3 h-3" />
-                          )}
-                          {remainingRequests > 0
-                            ? "슈퍼 데이트 신청"
-                            : "신청권 소진"}
-                        </button>
-                      )}
-                    </div>
-                  )}
+                  {/* 제목 */}
+                  <h3 className="mt-3 text-xl font-bold text-gray-900 dark:text-white">
+                    {intro.title}
+                  </h3>
+
+                  {/* 자기소개 내용 */}
+                  <p className="mt-2 text-gray-600 line-clamp-3 dark:text-gray-300">
+                    {intro.content}
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {filteredIntroductions.length === 0 && (
