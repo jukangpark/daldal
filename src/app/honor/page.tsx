@@ -323,6 +323,14 @@ export default function HonorPage() {
         ></div>
       </div>
 
+      <div className="text-center text-gray-500 dark:text-gray-400">
+        📅 매월 새로운 투표 기회
+      </div>
+
+      <div className="text-center text-gray-500  dark:text-gray-400">
+        🏆 명예의 전당은 누적 데이터로 선정
+      </div>
+
       {/* 투표하기 버튼 */}
       <div className="flex justify-center mt-8">
         <button
