@@ -143,7 +143,6 @@ export default function HonorPage() {
       (intro) => intro.user_id === result.user_id
     );
     const profileImage = userIntroduction?.photos?.[0];
-
     const userGender = userIntroduction?.user_gender || "male";
 
     return (
@@ -327,7 +326,7 @@ export default function HonorPage() {
         📅 매월 새로운 투표 기회
       </div>
 
-      <div className="text-center text-gray-500  dark:text-gray-400">
+      <div className="text-center text-gray-500 dark:text-gray-400">
         🏆 명예의 전당은 누적 데이터로 선정
       </div>
 

@@ -7,7 +7,6 @@ import {
   AlertCircle,
   Users,
   Heart,
-  Shield,
   Clock,
   DollarSign,
   Calendar,

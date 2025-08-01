@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { Camera, Heart, MessageCircle, MoreHorizontal } from "lucide-react";
+import { Camera, Heart, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {

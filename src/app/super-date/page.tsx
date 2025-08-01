@@ -1,15 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Loader2,
-  Gift,
-  Heart,
-  Star,
-  Calendar,
-  Users,
-  ArrowRight,
-} from "lucide-react";
+import { Gift, Heart, Star, Calendar, Users, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function SuperDatePage() {

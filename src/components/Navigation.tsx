@@ -6,10 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Menu,
   X,
-  Heart,
   User,
   FileText,
-  Home,
   LogIn,
   LogOut,
   BookOpen,
@@ -17,7 +15,6 @@ import {
   Sun,
   Moon,
   Gamepad2,
-  Medal,
   ChevronDown,
   Users,
   Camera,

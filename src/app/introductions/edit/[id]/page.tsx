@@ -3,15 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { selfIntroductionAPI, SelfIntroduction, fileAPI } from "@/lib/supabase";
+import { selfIntroductionAPI, fileAPI } from "@/lib/supabase";
 import {
   ArrowLeft,
   Save,
   Upload,
   X,
   User,
-  MapPin,
-  Calendar,
   Heart,
   Camera,
   Loader2,

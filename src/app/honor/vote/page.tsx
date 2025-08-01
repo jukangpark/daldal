@@ -8,14 +8,9 @@ import {
   Trophy,
   ArrowLeft,
   Users,
-  Star,
-  Crown,
-  User,
   CheckCircle,
   XCircle,
   Loader2,
-  Calendar,
-  Award,
   Flame,
   Sparkles,
   HeartHandshake,
@@ -112,9 +107,6 @@ export default function HonorVotePage() {
   const [loadingVotes, setLoadingVotes] = useState(true);
   const [loadingResults, setLoadingResults] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<VoteCategory | null>(
-    null
-  );
   const [voting, setVoting] = useState(false);
 
   // 현재 월-년 계산
@@ -241,10 +233,6 @@ export default function HonorVotePage() {
 
   const getUserVoteForCategory = (category: VoteCategory) => {
     return userVotes.find((vote) => vote.category === category);
-  };
-
-  const getResultsForCategory = (category: VoteCategory) => {
-    return results.filter((result) => result.category === category);
   };
 
   const getVotedCandidate = (targetId: string) => {

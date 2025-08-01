@@ -21,7 +21,6 @@ export default function IntroductionDetailPage() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   // 댓글 관련 상태
   const [comments, setComments] = useState<SelfIntroductionComment[]>([]);

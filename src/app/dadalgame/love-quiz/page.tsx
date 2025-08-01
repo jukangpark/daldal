@@ -4,16 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  Heart,
-  ArrowLeft,
-  Trophy,
-  Clock,
-  Users,
-  Star,
-  Target,
-  Zap,
-} from "lucide-react";
+import { Heart, ArrowLeft, Trophy, Clock, Star } from "lucide-react";
 
 interface Question {
   id: number;
