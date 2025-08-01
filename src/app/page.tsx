@@ -209,6 +209,14 @@ export default function HomePage() {
                       57회 (참여자 521명)
                     </span>
                   </div>
+                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg dark:bg-orange-900/20">
+                    <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                      🌙 7월 모임
+                    </span>
+                    <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                      56회 (참여자 336명)
+                    </span>
+                  </div>
                 </div>
               </div>
 
