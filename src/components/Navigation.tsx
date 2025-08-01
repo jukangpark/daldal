@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -36,6 +36,7 @@ const Navigation = () => {
   const [showCommunityDropdown, setShowCommunityDropdown] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const communityDropdownRef = useRef<HTMLDivElement>(null);
 
   const navItems = [
     { href: "/super-date", label: "이벤트", icon: Gift },
@@ -71,6 +72,23 @@ const Navigation = () => {
   ];
 
   const isActive = (href: string) => pathname === href;
+
+  // 드롭다운 외부 클릭 감지
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        communityDropdownRef.current &&
+        !communityDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowCommunityDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleNavItemClick = (item: any, e: React.MouseEvent) => {
     if (item.requiresAuth && !user) {
@@ -141,7 +159,7 @@ const Navigation = () => {
             })}
 
             {/* 달달 커뮤니티 드롭다운 */}
-            <div className="relative">
+            <div className="relative" ref={communityDropdownRef}>
               <button
                 onClick={() => setShowCommunityDropdown(!showCommunityDropdown)}
                 className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
