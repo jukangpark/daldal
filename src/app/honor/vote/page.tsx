@@ -4,17 +4,12 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import {
-  Heart,
   Trophy,
   ArrowLeft,
   Users,
   CheckCircle,
   XCircle,
   Loader2,
-  Flame,
-  Sparkles,
-  HeartHandshake,
-  Palette,
 } from "lucide-react";
 import {
   honorVoteAPI,
@@ -23,77 +18,8 @@ import {
   HonorResult,
 } from "@/lib/supabase";
 import UserAvatar from "@/components/UserAvatar";
-
-type VoteCategory =
-  | "hot_girl"
-  | "hot_boy"
-  | "manner"
-  | "sexy"
-  | "cute"
-  | "style";
-
-interface CategoryInfo {
-  id: VoteCategory;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  color: string;
-  bgColor: string;
-  gender?: "male" | "female";
-}
-
-const CATEGORIES: CategoryInfo[] = [
-  {
-    id: "hot_girl",
-    title: "핫 걸",
-    description: "너 내꺼 할래?",
-    icon: <Flame className="w-6 h-6" />,
-    color: "text-pink-500",
-    bgColor: "bg-pink-400 dark:bg-pink-900/40",
-    gender: "female",
-  },
-  {
-    id: "hot_boy",
-    title: "핫 보이",
-    description: "너 내꺼 할래?",
-    icon: <Flame className="w-6 h-6" />,
-    color: "text-blue-500",
-    bgColor: "bg-blue-400 dark:bg-blue-900/40",
-    gender: "male",
-  },
-  {
-    id: "manner",
-    title: "매너",
-    description: "가장 예의 바른 사람에게 투표하세요",
-    icon: <HeartHandshake className="w-6 h-6" />,
-    color: "text-green-500",
-    bgColor: "bg-green-400 dark:bg-green-900/40",
-  },
-  {
-    id: "sexy",
-    title: "세쿠시",
-    description: "가장 세쿠시한 사람에게 투표하세요",
-    icon: <Sparkles className="w-6 h-6" />,
-    color: "text-purple-500",
-    bgColor: "bg-purple-400 dark:bg-purple-900/40",
-  },
-  {
-    id: "cute",
-    title: "귀여운",
-    description: "가장 귀요미한 사람에게 투표하세요",
-    icon: <Heart className="w-6 h-6" />,
-    color: "text-red-500",
-    bgColor: "bg-red-400 dark:bg-red-900/40",
-  },
-  {
-    id: "style",
-    title: "패피",
-    description: "가장 스타일리시한 사람에게 투표하세요",
-    icon: <Palette className="w-6 h-6" />,
-    color: "text-yellow-500",
-    bgColor: "bg-yellow-400 dark:bg-yellow-900/40",
-  },
-];
+import { voteCategories, getIconComponent } from "@/app/constants";
+import { VoteCategory } from "@/app/constants/voteCategories";
 
 export default function HonorVotePage() {
   const { user, loading } = useAuth();
@@ -223,7 +149,7 @@ export default function HonorVotePage() {
   };
 
   const getFilteredCandidates = (category: VoteCategory) => {
-    const categoryInfo = CATEGORIES.find((c) => c.id === category);
+    const categoryInfo = voteCategories.find((c) => c.id === category);
 
     if (categoryInfo?.gender) {
       return candidates.filter((c) => c.user_gender === categoryInfo.gender);
@@ -308,19 +234,22 @@ export default function HonorVotePage() {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {CATEGORIES.map((category) => {
+            {voteCategories.map((category) => {
               const filteredCandidates = getFilteredCandidates(category.id);
               const userVote = getUserVoteForCategory(category.id);
               const votedCandidate = userVote
                 ? getVotedCandidate(userVote.target_id)
                 : null;
+              const IconComponent = getIconComponent(category.iconName);
 
               return (
                 <div key={category.id} className="card">
                   <div
                     className={`flex items-center mb-4 p-4 rounded-lg ${category.bgColor}`}
                   >
-                    <div className="mr-3 text-white">{category.icon}</div>
+                    <div className="mr-3 text-white">
+                      <IconComponent className="w-6 h-6" />
+                    </div>
                     <h3 className="text-lg font-semibold text-white">
                       {category.title}
                     </h3>

@@ -42,9 +42,6 @@ export default function HonorPage() {
   const [introductions, setIntroductions] = useState<SelfIntroduction[]>([]);
   const [animateIn, setAnimateIn] = useState(false);
 
-  // 현재 월-년 계산
-  const currentMonthYear = new Date().toISOString().slice(0, 7); // '2024-12' 형식
-
   // 결과 데이터 로드
   useEffect(() => {
     loadResults();
