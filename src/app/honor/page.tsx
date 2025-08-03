@@ -9,7 +9,6 @@ import {
   Heart,
   Users,
   Sparkles,
-  User,
   Loader2,
   Flame,
   HeartHandshake,
@@ -24,48 +23,7 @@ import {
 import LoginModal from "@/components/LoginModal";
 import SignupModal from "@/components/SignupModal";
 import UserAvatar from "@/components/UserAvatar";
-
-// 카테고리 정보
-const categoryInfo = {
-  hot_girl: {
-    label: "핫 걸",
-    icon: Flame,
-    color: "text-pink-500",
-    bgColor: "bg-pink-400 dark:bg-pink-900/40",
-    gender: "female" as const,
-  },
-  hot_boy: {
-    label: "핫 보이",
-    icon: Flame,
-    color: "text-blue-500",
-    bgColor: "bg-blue-400 dark:bg-blue-900/40",
-    gender: "male" as const,
-  },
-  manner: {
-    label: "매너",
-    icon: HeartHandshake,
-    color: "text-green-500",
-    bgColor: "bg-green-400 dark:bg-green-900/40",
-  },
-  sexy: {
-    label: "세쿠시",
-    icon: Sparkles,
-    color: "text-purple-500",
-    bgColor: "bg-purple-400 dark:bg-purple-900/40",
-  },
-  cute: {
-    label: "귀여운",
-    icon: Heart,
-    color: "text-red-500",
-    bgColor: "bg-red-400 dark:bg-red-900/40",
-  },
-  style: {
-    label: "패피",
-    icon: Palette,
-    color: "text-yellow-500",
-    bgColor: "bg-yellow-400 dark:bg-yellow-900/40",
-  },
-};
+import { honorCategoryInfo } from "@/app/constants";
 
 const rankIcons = [
   <span key="1">🥇</span>,
@@ -135,7 +93,8 @@ export default function HonorPage() {
     result: HonorResult;
     category: string;
   }) => {
-    const categoryData = categoryInfo[category as keyof typeof categoryInfo];
+    const categoryData =
+      honorCategoryInfo[category as keyof typeof honorCategoryInfo];
     const Icon = categoryData.icon;
 
     // 해당 사용자의 자소설 찾기
@@ -212,7 +171,8 @@ export default function HonorPage() {
       .sort((a, b) => (a.rank || 0) - (b.rank || 0))
       .slice(0, 3);
 
-    const categoryData = categoryInfo[category as keyof typeof categoryInfo];
+    const categoryData =
+      honorCategoryInfo[category as keyof typeof honorCategoryInfo];
 
     return (
       <div
