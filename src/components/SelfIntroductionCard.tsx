@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
-import { SelfIntroduction } from "@/lib/supabase";
+import { SelfIntroduction } from "@/lib/types";
 import UserAvatar from "@/components/UserAvatar";
 import MbtiBadge from "@/components/MbtiBadge";
 

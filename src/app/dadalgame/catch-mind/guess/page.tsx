@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Check, X, Trophy, Star, Loader2 } from "lucide-react";
-import { catchMindAPI } from "@/lib/supabase";
+import catchMindAPI from "@/lib/api/catchMind";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface GameState {

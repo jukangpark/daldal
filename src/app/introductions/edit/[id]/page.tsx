@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { selfIntroductionAPI, fileAPI } from "@/lib/supabase";
+import selfIntroductionAPI from "@/lib/api/self-introduction";
+import fileAPI from "@/lib/api/file";
 import {
   ArrowLeft,
   Save,

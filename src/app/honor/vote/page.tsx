@@ -11,12 +11,9 @@ import {
   XCircle,
   Loader2,
 } from "lucide-react";
-import {
-  honorVoteAPI,
-  VoteCandidate,
-  HonorVote,
-  HonorResult,
-} from "@/lib/supabase";
+import honorVoteAPI from "@/lib/api/honor";
+import { VoteCandidate } from "@/lib/types";
+import { HonorVote, HonorResult } from "@/lib/types";
 import UserAvatar from "@/components/UserAvatar";
 import { voteCategories, getIconComponent } from "@/app/constants";
 import { VoteCategory } from "@/app/constants/voteCategories";

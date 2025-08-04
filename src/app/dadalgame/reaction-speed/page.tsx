@@ -11,7 +11,7 @@ import {
   Zap,
   Loader2,
 } from "lucide-react";
-import { reactionSpeedAPI } from "@/lib/supabase";
+import reactionSpeedAPI from "@/lib/api/reactionSpeed";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface GameState {

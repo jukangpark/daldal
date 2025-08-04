@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, RotateCcw, Save, Download, Loader2 } from "lucide-react";
-import { catchMindAPI } from "@/lib/supabase";
+import catchMindAPI from "@/lib/api/catchMind";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function DrawPage() {

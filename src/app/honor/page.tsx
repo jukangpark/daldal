@@ -14,12 +14,10 @@ import {
   HeartHandshake,
   Palette,
 } from "lucide-react";
-import {
-  honorVoteAPI,
-  HonorResult,
-  selfIntroductionAPI,
-  SelfIntroduction,
-} from "@/lib/supabase";
+import honorVoteAPI from "@/lib/api/honor";
+import selfIntroductionAPI from "@/lib/api/self-introduction";
+import { HonorResult } from "@/lib/types";
+import { SelfIntroduction } from "@/lib/types";
 import LoginModal from "@/components/LoginModal";
 import SignupModal from "@/components/SignupModal";
 import UserAvatar from "@/components/UserAvatar";

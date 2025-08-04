@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -15,12 +16,9 @@ import {
 import UserAvatar from "@/components/UserAvatar";
 import SelfIntroductionCard from "@/components/SelfIntroductionCard";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  selfIntroductionAPI,
-  superDateAPI,
-  SelfIntroduction,
-  supabase,
-} from "@/lib/supabase";
+import selfIntroductionAPI from "@/lib/api/self-introduction";
+import superDateAPI from "@/lib/api/super-date";
+import { SelfIntroduction } from "@/lib/types";
 
 export default function ProfilePage() {
   const { user, loading } = useAuth();

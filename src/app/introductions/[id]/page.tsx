@@ -3,12 +3,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  selfIntroductionAPI,
-  SelfIntroduction,
-  selfIntroductionCommentAPI,
-  SelfIntroductionComment,
-} from "@/lib/supabase";
+import selfIntroductionAPI from "@/lib/api/self-introduction";
+import selfIntroductionCommentAPI from "@/lib/api/self-introduction-comment";
+import { SelfIntroduction, SelfIntroductionComment } from "@/lib/types";
 import { ArrowLeft, Loader2, X, Send } from "lucide-react";
 import SelfIntroductionCard from "@/components/SelfIntroductionCard";
 

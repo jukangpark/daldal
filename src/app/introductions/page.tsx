@@ -14,15 +14,13 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import {
-  selfIntroductionAPI,
-  superDateAPI,
-  SelfIntroduction,
-} from "@/lib/supabase";
+import selfIntroductionAPI from "@/lib/api/self-introduction";
+import { SelfIntroduction } from "@/lib/types";
 import LoginModal from "@/components/LoginModal";
 import SignupModal from "@/components/SignupModal";
 import UserAvatar from "@/components/UserAvatar";
 import MbtiBadge from "@/components/MbtiBadge";
+import superDateAPI from "@/lib/api/super-date";
 
 export default function IntroductionsPage() {
   const { user } = useAuth();

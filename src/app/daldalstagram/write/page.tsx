@@ -5,7 +5,8 @@ import { Camera, X, Upload, ArrowLeft } from "lucide-react";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { daldalstagramAPI, fileAPI } from "@/lib/supabase";
+import daldalstagramAPI from "@/lib/api/daldalstagram";
+import fileAPI from "@/lib/api/file";
 
 const WriteDaldalstagramPage = () => {
   const { user } = useAuth();

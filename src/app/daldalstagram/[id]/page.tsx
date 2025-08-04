@@ -16,12 +16,9 @@ import {
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import {
-  daldalstagramAPI,
-  daldalstagramCommentAPI,
-  DaldalstagramPost,
-  DaldalstagramComment,
-} from "@/lib/supabase";
+import daldalstagramAPI from "@/lib/api/daldalstagram";
+import daldalstagramCommentAPI from "@/lib/api/daldalstagram-comment";
+import { DaldalstagramPost, DaldalstagramComment } from "@/lib/types";
 
 const DaldalstagramDetailPage = () => {
   const { user } = useAuth();

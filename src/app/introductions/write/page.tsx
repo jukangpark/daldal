@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 export const runtime = "edge";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { selfIntroductionAPI, fileAPI } from "@/lib/supabase";
+import selfIntroductionAPI from "@/lib/api/self-introduction";
+import fileAPI from "@/lib/api/file";
 import {
   ArrowLeft,
   Save,
