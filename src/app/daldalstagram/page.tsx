@@ -5,7 +5,7 @@ import { Camera, Heart, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import daldalstagramAPI from "@/lib/api/daldalstagram";
-import daldalstagramCommentAPI from "@/lib/api/daldalstagram";
+import daldalstagramCommentAPI from "@/lib/api/daldalstagram-comment";
 import { DaldalstagramPost } from "@/lib/types";
 import LoginModal from "@/components/LoginModal";
 
@@ -18,6 +18,8 @@ const DaldalstagramPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+
+  console.log("posts", posts);
 
   useEffect(() => {
     fetchPosts();
@@ -39,7 +41,7 @@ const DaldalstagramPage = () => {
         data?.map(async (post) => {
           const [likeData, commentsData] = await Promise.all([
             daldalstagramAPI.checkLikeStatus(post.id),
-            daldalstagramCommentAPI.getAll(),
+            daldalstagramCommentAPI.getAll(post.id),
           ]);
 
           return {
@@ -49,6 +51,8 @@ const DaldalstagramPage = () => {
           };
         }) || []
       );
+
+      console.log("postsWithDetails", postsWithDetails);
 
       setPosts(postsWithDetails);
     } catch (error) {
