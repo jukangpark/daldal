@@ -166,6 +166,7 @@ export default function RulesPage() {
           <div>
             2025.7.8. (오프라인 모임 규칙 완화 및 게스트 관련 조항 수정)
           </div>
+          <div>2025.7.23. (재가입시 회비 즉시 납부 규정 추가)</div>
         </div>
       </div>
 
@@ -181,7 +182,7 @@ export default function RulesPage() {
           </p>
           <div className="flex justify-center items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
             <Clock className="w-4 h-4" />
-            <span>최종 업데이트: 2025년 7월 8일</span>
+            <span>최종 업데이트: 2025년 7월 23일</span>
           </div>
         </div>
       </div>
