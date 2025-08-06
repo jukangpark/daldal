@@ -55,6 +55,7 @@ export default function ProfilePage() {
       introduction: string;
       matched_at: string;
       introduction_id: string;
+      user_gender: "male" | "female";
     }>
   >([]);
 
@@ -265,6 +266,7 @@ export default function ProfilePage() {
         introduction: string;
         matched_at: string;
         introduction_id: string; // 자소설 ID 추가
+        user_gender: "male" | "female";
       }> = [];
 
       for (const sentRequest of sentRequests || []) {
@@ -288,6 +290,7 @@ export default function ProfilePage() {
               introduction: introData.content,
               matched_at: sentRequest.created_at,
               introduction_id: introData.id, // 자소설 ID 저장
+              user_gender: introData.user_gender || "male",
             });
           }
         }
@@ -586,7 +589,7 @@ export default function ProfilePage() {
                             : null
                         }
                         userName={person.name}
-                        gender="male" // 여기서는 성별 정보가 없으므로 기본값 사용
+                        gender={person.user_gender}
                         size="lg"
                         isVVIP={false}
                       />
