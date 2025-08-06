@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { PrivateChatMessage } from "@/types/chat";
 import selfIntroductionAPI from "@/lib/api/self-introduction";
 import privateChatAPI from "@/lib/api/private-chat";
+import superDateAPI from "@/lib/api/super-date";
 import UserAvatar from "@/components/UserAvatar";
 
 interface ChatUser {
@@ -30,6 +31,8 @@ export default function PrivateChat() {
   const [targetUser, setTargetUser] = useState<ChatUser | null>(null);
   const [loadingTargetUser, setLoadingTargetUser] = useState(true);
   const [currentUser, setCurrentUser] = useState<ChatUser | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [checkingConnection, setCheckingConnection] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -142,14 +145,59 @@ export default function PrivateChat() {
     }
   };
 
+  // 연결 상태 확인
+  useEffect(() => {
+    if (user && targetUserId) {
+      checkUserConnection();
+    }
+  }, [user, targetUserId]);
+
+  // 연결 상태 확인 함수
+  const checkUserConnection = async () => {
+    if (!user || !targetUserId) return;
+
+    try {
+      setCheckingConnection(true);
+
+      const { connected, error } = await superDateAPI.areUsersConnected(
+        user.id,
+        targetUserId
+      );
+
+      if (error) {
+        console.error("Error checking connection:", error);
+        setIsConnected(false);
+      } else {
+        setIsConnected(connected);
+      }
+    } catch (error) {
+      console.error("Error checking connection:", error);
+      setIsConnected(false);
+    } finally {
+      setCheckingConnection(false);
+    }
+  };
+
   // 자동 입장 처리
   useEffect(() => {
-    if (user && !isJoined && targetUser && currentUser) {
-      handleAutoJoin();
+    if (user && !isJoined && targetUser && currentUser && !checkingConnection) {
+      if (isConnected) {
+        handleAutoJoin();
+      } else {
+        // 연결되지 않은 경우에도 사용자 확인 완료로 처리
+        setIsCheckingUser(false);
+      }
     } else if (user && isJoined) {
       setIsCheckingUser(false);
     }
-  }, [user, isJoined, targetUser, currentUser]);
+  }, [
+    user,
+    isJoined,
+    targetUser,
+    currentUser,
+    isConnected,
+    checkingConnection,
+  ]);
 
   // 자동 입장 처리
   const handleAutoJoin = async () => {
@@ -330,7 +378,11 @@ export default function PrivateChat() {
           <User className="mx-auto mb-4 w-12 h-12 text-primary-600" />
           <div className="mx-auto w-12 h-12 rounded-full border-b-2 animate-spin border-primary-600"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">
-            {authLoading ? "인증 확인 중..." : "채팅방 준비 중..."}
+            {authLoading
+              ? "인증 확인 중..."
+              : loadingTargetUser
+              ? "사용자 정보 로드 중..."
+              : "채팅방 준비 중..."}
           </p>
         </div>
       </div>
@@ -370,6 +422,53 @@ export default function PrivateChat() {
           >
             뒤로 가기
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 연결 확인 중일 때 로딩 화면
+  if (checkingConnection) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <User className="mx-auto mb-4 w-12 h-12 text-primary-600" />
+          <div className="mx-auto w-12 h-12 rounded-full border-b-2 animate-spin border-primary-600"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            연결 상태 확인 중...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // 연결되지 않은 사용자 접근 제한
+  if (!isConnected) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <User className="mx-auto mb-4 w-12 h-12 text-red-600" />
+          <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+            접근이 제한되었습니다
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            서로 슈퍼데이트 신청을 완료한 사용자만 1:1 채팅을 이용할 수
+            있습니다.
+          </p>
+          <div className="mt-6 space-y-3">
+            <button
+              onClick={() => router.push("/profile")}
+              className="px-4 py-2 text-white rounded-lg transition-colors bg-primary-600 hover:bg-primary-700"
+            >
+              프로필로 돌아가기
+            </button>
+            <button
+              onClick={() => router.back()}
+              className="block px-4 py-2 text-gray-600 transition-colors dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+            >
+              뒤로 가기
+            </button>
+          </div>
         </div>
       </div>
     );
