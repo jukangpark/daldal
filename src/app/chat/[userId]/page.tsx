@@ -425,7 +425,8 @@ export default function PrivateChat() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
+              {/* 데스크톱에서만 현재 사용자 정보 표시 */}
+              <div className="hidden items-center space-x-2 md:flex">
                 <div className="flex items-center space-x-2">
                   <UserAvatar
                     imageUrl={currentUser?.photo}
