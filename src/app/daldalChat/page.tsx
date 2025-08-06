@@ -707,7 +707,11 @@ export default function DaldalChat() {
                 <div className="px-4 py-2 max-w-xs text-white rounded-lg lg:max-w-md bg-primary-600">
                   <div className="text-sm">{msg.message}</div>
                   <div className="mt-1 text-xs opacity-75">
-                    {new Date(msg.created_at).toLocaleTimeString()}
+                    {new Date(msg.created_at).toLocaleTimeString("ko-KR", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                    })}
                   </div>
                 </div>
               ) : (
@@ -729,7 +733,11 @@ export default function DaldalChat() {
                     <div className="px-4 py-2 text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:text-white dark:border-gray-600">
                       <div className="text-sm">{msg.message}</div>
                       <div className="mt-1 text-xs opacity-75">
-                        {new Date(msg.created_at).toLocaleTimeString()}
+                        {new Date(msg.created_at).toLocaleTimeString("ko-KR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: false,
+                        })}
                       </div>
                     </div>
                   </div>

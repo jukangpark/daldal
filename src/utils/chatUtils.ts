@@ -27,4 +27,4 @@ export const getUserColor = (userId: string): string => {
   }
 
   return colors[Math.abs(hash) % colors.length];
-}; 
+};

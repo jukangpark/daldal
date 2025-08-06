@@ -554,7 +554,7 @@ export default function ProfilePage() {
 
           <div className="flex items-center mb-6 text-sm text-gray-500 dark:text-gray-400">
             <HelpCircle className="mr-1 w-4 h-4" />
-            <span>나를 선택했지만 아직 내가 선택하지 않은 사람들</span>
+            <span>서로 선택하여 연결된 이성들</span>
           </div>
 
           {loadingConnectedPeople ? (
@@ -623,14 +623,23 @@ export default function ProfilePage() {
                       <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
                         {person.introduction}
                       </p>
-                      <div className="flex mt-3 space-x-2">
+                      <div className="flex mt-4 space-x-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // 카드 클릭 이벤트 방지
+                            router.push(`/chat/${person.id}`);
+                          }}
+                          className="px-4 py-2 text-sm text-white bg-green-600 rounded-lg shadow-sm transition-colors hover:bg-green-700"
+                        >
+                          💬 1:1 대화하기
+                        </button>
                         {hasSuperDateTicket && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation(); // 카드 클릭 이벤트 방지
                               handleUseSuperDateTicket(person.name);
                             }}
-                            className="px-3 py-1 text-xs text-white rounded-full transition-colors bg-primary-600 hover:bg-primary-700"
+                            className="px-4 py-2 text-sm text-white rounded-lg shadow-sm transition-colors bg-primary-600 hover:bg-primary-700"
                           >
                             슈퍼데이트 신청
                           </button>

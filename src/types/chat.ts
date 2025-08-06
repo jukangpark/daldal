@@ -19,3 +19,15 @@ export interface OnlineUser {
 }
 
 export type NicknameModalMode = "create" | "edit";
+
+// 1:1 채팅을 위한 확장된 타입들
+export interface PrivateChatMessage extends ChatMessage {
+  chat_id: string;
+}
+
+export interface PrivateChatUser {
+  chat_id: string;
+  user_id: string;
+  nickname: string;
+  last_seen: string;
+}
