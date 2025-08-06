@@ -76,7 +76,7 @@ export default function PrivateChat() {
             introData.photos && introData.photos.length > 0
               ? introData.photos[0]
               : "/default-avatar.png",
-          gender: introData.gender || "male",
+          gender: introData.user_gender || "male",
         });
       } else {
         // 자소설이 없는 경우 기본 정보로 설정
@@ -118,7 +118,7 @@ export default function PrivateChat() {
             introData.photos && introData.photos.length > 0
               ? introData.photos[0]
               : "/default-avatar.png",
-          gender: introData.gender || "male",
+          gender: introData.user_gender || "male",
         });
       } else {
         // 자소설이 없는 경우 기본 정보로 설정
