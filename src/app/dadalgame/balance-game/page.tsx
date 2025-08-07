@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Scale, MessageCircle, Users, Filter } from "lucide-react";
+import { Scale, MessageCircle, Users, Filter, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import balanceGameAPI from "@/lib/api/balance-game";
 import { BalanceGameWithStats } from "@/lib/types/balance-game";
@@ -215,9 +215,7 @@ export default function BalanceGamePage() {
                               A. {game.option_a}
                             </span>
                             {hasVoted && isOptionA && (
-                              <span className="text-xs text-primary-600 dark:text-primary-400">
-                                ✓ 선택함
-                              </span>
+                              <CheckCircle className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                             )}
                           </div>
                         </div>
@@ -234,9 +232,7 @@ export default function BalanceGamePage() {
                               B. {game.option_b}
                             </span>
                             {hasVoted && isOptionB && (
-                              <span className="text-xs text-primary-600 dark:text-primary-400">
-                                ✓ 선택함
-                              </span>
+                              <CheckCircle className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                             )}
                           </div>
                         </div>
