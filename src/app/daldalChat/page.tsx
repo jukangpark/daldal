@@ -12,9 +12,10 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserColor } from "@/utils/chatUtils";
-import { ChatMessage, TypingUser, OnlineUser } from "@/types/chat";
+import { ChatMessage, OnlineUser } from "@/types/chat";
 import NickNameModal from "@/components/NickNameModal";
 import daldalChatAPI from "@/lib/api/daldalChat";
+import { supabase } from "@/lib/supabase";
 
 export default function DaldalChat() {
   const { user, loading: authLoading } = useAuth();
@@ -23,16 +24,12 @@ export default function DaldalChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isJoined, setIsJoined] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
-  const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
   const [isCheckingUser, setIsCheckingUser] = useState(true); // 사용자 확인 중 상태
   const [isNoticeExpanded, setIsNoticeExpanded] = useState(true); // 공지사항 펼침/접힘 상태
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+
   // 상태 추가
   const [nicknameModalOpen, setNicknameModalOpen] = useState(false);
-  const [nicknameModalMode, setNicknameModalMode] = useState<"create" | "edit">(
-    "create"
-  );
 
   // 메시지 스크롤을 맨 아래로
   const scrollToBottom = () => {
@@ -95,63 +92,22 @@ export default function DaldalChat() {
     }
   };
 
-  // 채팅방 입장
-  const handleJoin = async () => {
-    if (!user || !nickname.trim()) return;
-
-    try {
-      const { data, error } = await daldalChatAPI.joinChat(
-        user.id,
-        nickname.trim()
-      );
-
-      if (error) {
-        console.error("Error joining chat:", error);
-        alert("채팅방 입장 중 오류가 발생했습니다.");
-        return;
-      }
-
-      setIsJoined(true);
-    } catch (error) {
-      console.error("Error joining chat:", error);
-      alert("채팅방 입장 중 오류가 발생했습니다.");
-    }
-  };
-
-  // 온라인 사용자 제거
-  const removeOnlineUser = async () => {
-    if (!user) return;
-
-    try {
-      await daldalChatAPI.removeOnlineUser(user.id);
-    } catch (error) {
-      console.error("Error removing online user:", error);
-    }
-  };
-
   // 채팅방 완전 나가기 (모든 데이터 삭제)
   const handleLeaveChat = async () => {
     if (!user) return;
 
     try {
-      // 타이핑 상태 제거
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-      }
-      await daldalChatAPI.removeTypingStatus(user.id);
-
-      // 온라인 사용자에서 제거
-      await daldalChatAPI.removeOnlineUser(user.id);
-
       // 해당 사용자의 모든 채팅 메시지 삭제
       await daldalChatAPI.deleteUserMessages(user.id);
+
+      // 온라인 사용자 제거
+      await daldalChatAPI.removeOnlineUser(user.id);
 
       // 상태 초기화
       setIsJoined(false);
       setNickname("");
       setMessages([]);
       setOnlineUsers([]);
-      setTypingUsers([]);
     } catch (error) {
       console.error("Error leaving chat:", error);
       alert("채팅방 나가기 중 오류가 발생했습니다.");
@@ -218,7 +174,7 @@ export default function DaldalChat() {
       const { data, error } = await daldalChatAPI.loadMessages(50);
 
       if (data) {
-        setMessages(data);
+        setMessages(data.reverse());
       }
     };
 
@@ -234,103 +190,74 @@ export default function DaldalChat() {
     loadMessages();
     loadOnlineUsers();
 
-    // 실시간 구독 설정
-    const unsubscribe = daldalChatAPI.setupRealtimeSubscriptions(user.id, {
-      onMessageInsert: (newMessage) => {
-        // 중복 메시지 방지
-        setMessages((prev) => {
-          const exists = prev.some(
-            (msg) =>
-              msg.user_id === newMessage.user_id &&
-              msg.message === newMessage.message &&
-              Math.abs(
-                new Date(msg.created_at).getTime() -
-                  new Date(newMessage.created_at).getTime()
-              ) < 1000
-          );
-          return exists ? prev : [...prev, newMessage];
-        });
-      },
-      onMessageDelete: (deletedMessage) => {
-        // 삭제된 메시지 제거
-        setMessages((prev) =>
-          prev.filter((msg) => msg.id !== deletedMessage.id)
-        );
-      },
-      onTypingInsert: (typingUser) => {
-        setTypingUsers((prev) => {
-          const filtered = prev.filter(
-            (user) => user.user_id !== typingUser.user_id
-          );
-          return [...filtered, typingUser];
-        });
-      },
-      onTypingDelete: (deletedUser) => {
-        setTypingUsers((prev) =>
-          prev.filter((user) => user.user_id !== deletedUser.user_id)
-        );
-      },
-      onOnlineUserInsert: async () => {
-        // 새로운 사용자 추가 또는 업데이트
-        const { data } = await daldalChatAPI.loadOnlineUsers();
-        if (data) {
-          setOnlineUsers(data);
+    // 실시간 메시지 구독
+    const messagesSubscription = supabase
+      .channel("chat_messages")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "chat_messages" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            const newMessage = payload.new as ChatMessage;
+            // 중복 메시지 방지
+            setMessages((prev) => {
+              const exists = prev.some(
+                (msg) =>
+                  msg.user_id === newMessage.user_id &&
+                  msg.message === newMessage.message &&
+                  Math.abs(
+                    new Date(msg.created_at).getTime() -
+                      new Date(newMessage.created_at).getTime()
+                  ) < 1000
+              );
+              return exists ? prev : [...prev, newMessage];
+            });
+          } else if (payload.eventType === "DELETE") {
+            const deletedMessage = payload.old as ChatMessage;
+            // 삭제된 메시지 제거
+            setMessages((prev) =>
+              prev.filter((msg) => msg.id !== deletedMessage.id)
+            );
+          }
         }
-      },
-      onOnlineUserUpdate: async () => {
-        // 사용자 업데이트
-        const { data } = await daldalChatAPI.loadOnlineUsers();
-        if (data) {
-          setOnlineUsers(data);
+      )
+      .subscribe();
+
+    // 온라인 사용자 구독
+    const onlineUsersSubscription = supabase
+      .channel("online_users")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "online_users" },
+        async (payload) => {
+          if (
+            payload.eventType === "INSERT" ||
+            payload.eventType === "UPDATE"
+          ) {
+            // 새로운 사용자 추가 또는 업데이트
+            const { data } = await daldalChatAPI.loadOnlineUsers();
+
+            if (data) {
+              setOnlineUsers(data);
+            }
+          } else if (payload.eventType === "DELETE") {
+            // 사용자 삭제 - 로컬에서 즉시 제거
+            const deletedUser = payload.old as OnlineUser;
+
+            // 전체 목록을 다시 가져와서 정확한 상태 유지
+            const { data } = await daldalChatAPI.loadOnlineUsers();
+
+            if (data) {
+              setOnlineUsers(data);
+            }
+          }
         }
-      },
-      onOnlineUserDelete: async () => {
-        // 사용자 삭제 - 전체 목록을 다시 가져와서 정확한 상태 유지
-        const { data } = await daldalChatAPI.loadOnlineUsers();
-        if (data) {
-          setOnlineUsers(data);
-        }
-      },
-    });
+      )
+      .subscribe();
 
-    return unsubscribe;
-  }, [isJoined, user]);
-
-  // 타이핑 사용자 정리 (3초 이상 타이핑하지 않은 사용자 제거)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      setTypingUsers((prev) =>
-        prev.filter((user) => {
-          const lastTyping = new Date(user.lastTyping);
-          return now.getTime() - lastTyping.getTime() < 3000;
-        })
-      );
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // 페이지를 벗어날 때 완전 정리
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (isJoined && user) {
-        // 타이핑 상태 제거
-        daldalChatAPI.removeTypingStatus(user.id);
-        // 온라인 사용자에서 제거
-        daldalChatAPI.removeOnlineUser(user.id);
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      if (isJoined && user) {
-        // 타이핑 상태 제거
-        daldalChatAPI.removeTypingStatus(user.id);
-        // 온라인 사용자에서 제거
-        daldalChatAPI.removeOnlineUser(user.id);
-      }
+      messagesSubscription.unsubscribe();
+      onlineUsersSubscription.unsubscribe();
     };
   }, [isJoined, user]);
 
@@ -398,7 +325,9 @@ export default function DaldalChat() {
             setNicknameModalOpen(false);
             await handleJoinWithNickname(newNickname);
           }}
-          onCancel={() => {}}
+          onCancel={() => {
+            window.location.href = "/";
+          }}
         />
         <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900">
           <div className="p-6 w-full max-w-md bg-white rounded-lg shadow-lg dark:bg-gray-800">
@@ -444,7 +373,6 @@ export default function DaldalChat() {
                   </span>
                   <button
                     onClick={() => {
-                      setNicknameModalMode("edit");
                       setNicknameModalOpen(true);
                     }}
                     className="p-1 text-gray-400 transition-colors duration-200 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
@@ -538,11 +466,7 @@ export default function DaldalChat() {
                 <div className="px-4 py-2 max-w-xs text-white rounded-lg lg:max-w-md bg-primary-600">
                   <div className="text-sm">{msg.message}</div>
                   <div className="mt-1 text-xs opacity-75">
-                    {new Date(msg.created_at).toLocaleTimeString("ko-KR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: false,
-                    })}
+                    {new Date(msg.created_at).toLocaleTimeString()}
                   </div>
                 </div>
               ) : (
@@ -564,11 +488,7 @@ export default function DaldalChat() {
                     <div className="px-4 py-2 text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:text-white dark:border-gray-600">
                       <div className="text-sm">{msg.message}</div>
                       <div className="mt-1 text-xs opacity-75">
-                        {new Date(msg.created_at).toLocaleTimeString("ko-KR", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: false,
-                        })}
+                        {new Date(msg.created_at).toLocaleTimeString()}
                       </div>
                     </div>
                   </div>
@@ -576,41 +496,6 @@ export default function DaldalChat() {
               )}
             </div>
           ))}
-
-          {/* 타이핑 표시 */}
-          {typingUsers.length > 0 && (
-            <div className="flex justify-start">
-              <div className="flex items-start space-x-2">
-                <div className="flex-shrink-0">
-                  <div
-                    className={`flex justify-center items-center w-8 h-8 rounded-full ${getUserColor(
-                      typingUsers[0].user_id
-                    )}`}
-                  >
-                    <User className="w-4 h-4 text-white" />
-                  </div>
-                </div>
-                <div className="flex flex-col">
-                  <div className="mb-1 text-xs text-gray-600 dark:text-gray-400">
-                    {typingUsers.map((user) => user.nickname).join(", ")}
-                  </div>
-                  <div className="px-4 py-2 bg-gray-100 rounded-lg dark:bg-gray-700">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.1s" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div ref={messagesEndRef} />
         </div>

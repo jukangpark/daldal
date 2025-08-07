@@ -1,5 +1,5 @@
 import { supabase } from "../supabase";
-import { ChatMessage, TypingUser, OnlineUser } from "@/types/chat";
+import { ChatMessage, TypingUser } from "@/types/chat";
 
 // 달달톡 채팅 API
 const daldalChatAPI = {
@@ -8,7 +8,8 @@ const daldalChatAPI = {
     try {
       const { data: allData, error } = await supabase
         .from("online_users")
-        .select("nickname, user_id");
+        .select("nickname, user_id")
+        .eq("user_id", userId);
 
       if (allData) {
         const matchingUser = allData.find(
@@ -42,21 +43,6 @@ const daldalChatAPI = {
     }
   },
 
-  // 채팅방 입장
-  async joinChat(userId: string, nickname: string) {
-    try {
-      const { data, error } = await supabase.from("online_users").upsert({
-        user_id: userId,
-        nickname: nickname.trim(),
-        last_seen: new Date().toISOString(),
-      });
-
-      return { data, error };
-    } catch (error) {
-      return { data: null, error };
-    }
-  },
-
   // 온라인 사용자 제거
   async removeOnlineUser(userId: string) {
     try {
@@ -71,17 +57,21 @@ const daldalChatAPI = {
     }
   },
 
-  // 타이핑 상태 제거
-  async removeTypingStatus(userId: string) {
+  // 채팅방 입장
+  async joinChat(userId: string, nickname: string) {
     try {
-      const { error } = await supabase
-        .from("typing_status")
-        .delete()
-        .eq("user_id", userId);
+      const { data, error } = await supabase.from("online_users").upsert(
+        {
+          user_id: userId,
+          nickname: nickname.trim(),
+          last_seen: new Date().toISOString(),
+        },
+        { onConflict: "user_id" }
+      );
 
-      return { error };
+      return { data, error };
     } catch (error) {
-      return { error };
+      return { data: null, error };
     }
   },
 
@@ -96,21 +86,6 @@ const daldalChatAPI = {
       return { error };
     } catch (error) {
       return { error };
-    }
-  },
-
-  // 타이핑 상태 업데이트
-  async updateTypingStatus(userId: string, nickname: string) {
-    try {
-      const { data, error } = await supabase.from("typing_status").upsert({
-        user_id: userId,
-        nickname: nickname,
-        lastTyping: new Date().toISOString(),
-      });
-
-      return { data, error };
-    } catch (error) {
-      return { data: null, error };
     }
   },
 
@@ -138,7 +113,7 @@ const daldalChatAPI = {
       const { data, error } = await supabase
         .from("chat_messages")
         .select("*")
-        .order("created_at", { ascending: true })
+        .order("created_at", { ascending: false })
         .limit(limit);
 
       return { data, error };

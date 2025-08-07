@@ -19,8 +19,6 @@ const DaldalstagramPage = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
 
-  console.log("posts", posts);
-
   useEffect(() => {
     fetchPosts();
   }, []);
@@ -51,8 +49,6 @@ const DaldalstagramPage = () => {
           };
         }) || []
       );
-
-      console.log("postsWithDetails", postsWithDetails);
 
       setPosts(postsWithDetails);
     } catch (error) {
