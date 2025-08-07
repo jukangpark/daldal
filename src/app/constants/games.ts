@@ -1,4 +1,4 @@
-import { Heart, Brain, Image, Zap, Magnet } from "lucide-react";
+import { Heart, Brain, Image, Zap, Magnet, Scale } from "lucide-react";
 
 interface GameItem {
   id: string;
@@ -68,6 +68,19 @@ const games: GameItem[] = [
     players: "1명",
     duration: "2분 이내",
     isNew: true,
+  },
+  {
+    id: "balance-game",
+    title: "밸런스 게임",
+    description:
+      "두 가지 선택지 중 무엇을 더 선호하는지 투표하고 토론해보세요!",
+    icon: Scale,
+    href: "/dadalgame/balance-game",
+    difficulty: "쉬움",
+    players: "다수",
+    duration: "5분 이내",
+    isNew: true,
+    isPopular: true,
   },
 ];
 

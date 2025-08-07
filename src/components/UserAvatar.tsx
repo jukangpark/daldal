@@ -3,7 +3,7 @@ import { User, Crown } from "lucide-react";
 interface UserAvatarProps {
   imageUrl?: string | null;
   userName: string;
-  gender: "male" | "female";
+  gender: "male" | "female" | "annonymous";
   size?: "sm" | "md" | "lg";
   className?: string;
   isVVIP?: boolean;
@@ -20,6 +20,11 @@ const genderColors = {
     bg: "bg-pink-100 dark:bg-pink-900/30",
     icon: "text-pink-500 dark:text-pink-400",
     border: "border-pink-200 dark:border-pink-700",
+  },
+  annonymous: {
+    bg: "bg-gray-100 dark:bg-gray-900/30",
+    icon: "text-gray-500 dark:text-gray-400",
+    border: "border-gray-200 dark:border-gray-700",
   },
 };
 

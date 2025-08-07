@@ -12,3 +12,6 @@ export * from "./honor";
 
 // Daldalstagram types
 export * from "./daldalstagram";
+
+// Balance Game types
+export * from "./balance-game";
