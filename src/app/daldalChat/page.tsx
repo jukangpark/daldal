@@ -10,11 +10,11 @@ import {
   ChevronUp,
   Edit3,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserColor } from "@/utils/chatUtils";
 import { ChatMessage, TypingUser, OnlineUser } from "@/types/chat";
 import NickNameModal from "@/components/NickNameModal";
+import daldalChatAPI from "@/lib/api/daldalChat";
 
 export default function DaldalChat() {
   const { user, loading: authLoading } = useAuth();
@@ -24,11 +24,8 @@ export default function DaldalChat() {
   const [isJoined, setIsJoined] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
   const [isCheckingUser, setIsCheckingUser] = useState(true); // 사용자 확인 중 상태
   const [isNoticeExpanded, setIsNoticeExpanded] = useState(true); // 공지사항 펼침/접힘 상태
-  const [isEditingNickname, setIsEditingNickname] = useState(false); // 닉네임 편집 모드
-  const [editingNickname, setEditingNickname] = useState(""); // 편집 중인 닉네임
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
   // 상태 추가
@@ -68,23 +65,13 @@ export default function DaldalChat() {
     if (!user) return;
 
     try {
-      // 전체 데이터를 가져와서 클라이언트에서 필터링
-      const { data: allData, error } = await supabase
-        .from("online_users")
-        .select("nickname, user_id");
+      const { data: existingNickname, error } =
+        await daldalChatAPI.loadExistingNickname(user.id);
 
-      if (allData) {
-        // 클라이언트에서 문자열로 변환해서 비교
-        const matchingUser = allData.find(
-          (item) => String(item.user_id).trim() === String(user.id).trim()
-        );
-
-        if (matchingUser?.nickname) {
-          setNickname(matchingUser.nickname);
-          // 기존 닉네임이 있으면 자동으로 채팅방 입장
-          await handleAutoJoin(matchingUser.nickname);
-        } else {
-        }
+      if (existingNickname) {
+        setNickname(existingNickname);
+        // 기존 닉네임이 있으면 자동으로 채팅방 입장
+        await handleAutoJoin(existingNickname);
       }
     } catch (error) {
     } finally {
@@ -98,17 +85,11 @@ export default function DaldalChat() {
     if (!user) return;
 
     try {
-      // 온라인 사용자로 등록 (last_seen 업데이트)
-      await supabase.from("online_users").upsert(
-        {
-          user_id: user.id,
-          nickname: existingNickname,
-          last_seen: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      );
+      const { error } = await daldalChatAPI.autoJoin(user.id, existingNickname);
 
-      setIsJoined(true);
+      if (!error) {
+        setIsJoined(true);
+      }
     } catch (error) {
       console.error("Error auto joining chat:", error);
     }
@@ -119,12 +100,10 @@ export default function DaldalChat() {
     if (!user || !nickname.trim()) return;
 
     try {
-      // 온라인 사용자로 등록
-      const { data, error } = await supabase.from("online_users").upsert({
-        user_id: user.id,
-        nickname: nickname.trim(),
-        last_seen: new Date().toISOString(),
-      });
+      const { data, error } = await daldalChatAPI.joinChat(
+        user.id,
+        nickname.trim()
+      );
 
       if (error) {
         console.error("Error joining chat:", error);
@@ -144,7 +123,7 @@ export default function DaldalChat() {
     if (!user) return;
 
     try {
-      await supabase.from("online_users").delete().eq("user_id", user.id);
+      await daldalChatAPI.removeOnlineUser(user.id);
     } catch (error) {
       console.error("Error removing online user:", error);
     }
@@ -159,13 +138,13 @@ export default function DaldalChat() {
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
-      await supabase.from("typing_status").delete().eq("user_id", user.id);
+      await daldalChatAPI.removeTypingStatus(user.id);
 
       // 온라인 사용자에서 제거
-      await supabase.from("online_users").delete().eq("user_id", user.id);
+      await daldalChatAPI.removeOnlineUser(user.id);
 
       // 해당 사용자의 모든 채팅 메시지 삭제
-      await supabase.from("chat_messages").delete().eq("user_id", user.id);
+      await daldalChatAPI.deleteUserMessages(user.id);
 
       // 상태 초기화
       setIsJoined(false);
@@ -173,37 +152,10 @@ export default function DaldalChat() {
       setMessages([]);
       setOnlineUsers([]);
       setTypingUsers([]);
-      setIsTyping(false);
     } catch (error) {
       console.error("Error leaving chat:", error);
       alert("채팅방 나가기 중 오류가 발생했습니다.");
     }
-  };
-
-  // 타이핑 상태 관리
-  const handleTyping = () => {
-    if (!user) return;
-
-    if (!isTyping) {
-      setIsTyping(true);
-      // 타이핑 시작을 다른 사용자에게 알림
-      supabase.from("typing_status").upsert({
-        user_id: user.id,
-        nickname: nickname,
-        lastTyping: new Date().toISOString(),
-      });
-    }
-
-    // 타이핑 타임아웃 리셋
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
-    typingTimeoutRef.current = setTimeout(() => {
-      setIsTyping(false);
-      // 타이핑 종료를 다른 사용자에게 알림
-      supabase.from("typing_status").delete().eq("user_id", user.id);
-    }, 3000);
   };
 
   // 메시지 전송
@@ -222,22 +174,13 @@ export default function DaldalChat() {
     setMessages((prev) => [...prev, newMessage]);
     setMessage("");
 
-    // 타이핑 상태 종료
-    setIsTyping(false);
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-    supabase.from("typing_status").delete().eq("user_id", user.id);
-
     try {
-      const { error } = await supabase.from("chat_messages").insert([
-        {
-          user_id: newMessage.user_id,
-          nickname: newMessage.nickname,
-          message: newMessage.message,
-          created_at: newMessage.created_at,
-        },
-      ]);
+      const { error } = await daldalChatAPI.sendMessage({
+        user_id: newMessage.user_id,
+        nickname: newMessage.nickname,
+        message: newMessage.message,
+        created_at: newMessage.created_at,
+      });
 
       if (error) {
         console.error("Error sending message:", error);
@@ -264,64 +207,6 @@ export default function DaldalChat() {
   // 메시지 입력 필드 변경 핸들러
   const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
-    handleTyping();
-  };
-
-  // 닉네임 편집 시작
-  const handleStartEditNickname = () => {
-    setEditingNickname(nickname);
-    setIsEditingNickname(true);
-  };
-
-  // 닉네임 편집 취소
-  const handleCancelEditNickname = () => {
-    setIsEditingNickname(false);
-    setEditingNickname("");
-  };
-
-  // 닉네임 저장
-  const handleSaveNickname = async () => {
-    if (
-      !user ||
-      !editingNickname.trim() ||
-      editingNickname.trim() === nickname
-    ) {
-      handleCancelEditNickname();
-      return;
-    }
-
-    try {
-      // 온라인 사용자 테이블에서 닉네임 업데이트
-      const { error } = await supabase
-        .from("online_users")
-        .update({ nickname: editingNickname.trim() })
-        .eq("user_id", user.id);
-
-      if (error) {
-        console.error("Error updating nickname:", error);
-        alert("닉네임 변경에 실패했습니다.");
-        return;
-      }
-
-      // 로컬 상태 업데이트
-      setNickname(editingNickname.trim());
-      setIsEditingNickname(false);
-      setEditingNickname("");
-    } catch (error) {
-      console.error("Error updating nickname:", error);
-      alert("닉네임 변경 중 오류가 발생했습니다.");
-    }
-  };
-
-  // 닉네임 편집 중 Enter 키 처리
-  const handleNicknameKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSaveNickname();
-    } else if (e.key === "Escape") {
-      e.preventDefault();
-      handleCancelEditNickname();
-    }
   };
 
   // 실시간 구독 설정
@@ -330,11 +215,7 @@ export default function DaldalChat() {
 
     // 기존 메시지 로드
     const loadMessages = async () => {
-      const { data, error } = await supabase
-        .from("chat_messages")
-        .select("*")
-        .order("created_at", { ascending: true })
-        .limit(50);
+      const { data, error } = await daldalChatAPI.loadMessages(50);
 
       if (data) {
         setMessages(data);
@@ -343,10 +224,7 @@ export default function DaldalChat() {
 
     // 온라인 사용자 로드
     const loadOnlineUsers = async () => {
-      const { data, error } = await supabase
-        .from("online_users")
-        .select("*")
-        .order("last_seen", { ascending: false });
+      const { data, error } = await daldalChatAPI.loadOnlineUsers();
 
       if (data) {
         setOnlineUsers(data);
@@ -356,109 +234,66 @@ export default function DaldalChat() {
     loadMessages();
     loadOnlineUsers();
 
-    // 실시간 메시지 구독
-    const messagesSubscription = supabase
-      .channel("chat_messages")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "chat_messages" },
-        (payload) => {
-          if (payload.eventType === "INSERT") {
-            const newMessage = payload.new as ChatMessage;
-            // 중복 메시지 방지
-            setMessages((prev) => {
-              const exists = prev.some(
-                (msg) =>
-                  msg.user_id === newMessage.user_id &&
-                  msg.message === newMessage.message &&
-                  Math.abs(
-                    new Date(msg.created_at).getTime() -
-                      new Date(newMessage.created_at).getTime()
-                  ) < 1000
-              );
-              return exists ? prev : [...prev, newMessage];
-            });
-          } else if (payload.eventType === "DELETE") {
-            const deletedMessage = payload.old as ChatMessage;
-            // 삭제된 메시지 제거
-            setMessages((prev) =>
-              prev.filter((msg) => msg.id !== deletedMessage.id)
-            );
-          }
+    // 실시간 구독 설정
+    const unsubscribe = daldalChatAPI.setupRealtimeSubscriptions(user.id, {
+      onMessageInsert: (newMessage) => {
+        // 중복 메시지 방지
+        setMessages((prev) => {
+          const exists = prev.some(
+            (msg) =>
+              msg.user_id === newMessage.user_id &&
+              msg.message === newMessage.message &&
+              Math.abs(
+                new Date(msg.created_at).getTime() -
+                  new Date(newMessage.created_at).getTime()
+              ) < 1000
+          );
+          return exists ? prev : [...prev, newMessage];
+        });
+      },
+      onMessageDelete: (deletedMessage) => {
+        // 삭제된 메시지 제거
+        setMessages((prev) =>
+          prev.filter((msg) => msg.id !== deletedMessage.id)
+        );
+      },
+      onTypingInsert: (typingUser) => {
+        setTypingUsers((prev) => {
+          const filtered = prev.filter(
+            (user) => user.user_id !== typingUser.user_id
+          );
+          return [...filtered, typingUser];
+        });
+      },
+      onTypingDelete: (deletedUser) => {
+        setTypingUsers((prev) =>
+          prev.filter((user) => user.user_id !== deletedUser.user_id)
+        );
+      },
+      onOnlineUserInsert: async () => {
+        // 새로운 사용자 추가 또는 업데이트
+        const { data } = await daldalChatAPI.loadOnlineUsers();
+        if (data) {
+          setOnlineUsers(data);
         }
-      )
-      .subscribe();
-
-    // 타이핑 상태 구독
-    const typingSubscription = supabase
-      .channel("typing_status")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "typing_status" },
-        (payload) => {
-          if (payload.eventType === "INSERT") {
-            const typingUser = payload.new as TypingUser;
-            if (typingUser.user_id !== user.id) {
-              setTypingUsers((prev) => {
-                const filtered = prev.filter(
-                  (user) => user.user_id !== typingUser.user_id
-                );
-                return [...filtered, typingUser];
-              });
-            }
-          } else if (payload.eventType === "DELETE") {
-            const deletedUser = payload.old as TypingUser;
-            setTypingUsers((prev) =>
-              prev.filter((user) => user.user_id !== deletedUser.user_id)
-            );
-          }
+      },
+      onOnlineUserUpdate: async () => {
+        // 사용자 업데이트
+        const { data } = await daldalChatAPI.loadOnlineUsers();
+        if (data) {
+          setOnlineUsers(data);
         }
-      )
-      .subscribe();
-
-    // 온라인 사용자 구독
-    const onlineUsersSubscription = supabase
-      .channel("online_users")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "online_users" },
-        async (payload) => {
-          if (
-            payload.eventType === "INSERT" ||
-            payload.eventType === "UPDATE"
-          ) {
-            // 새로운 사용자 추가 또는 업데이트
-            const { data } = await supabase
-              .from("online_users")
-              .select("*")
-              .order("last_seen", { ascending: false });
-
-            if (data) {
-              setOnlineUsers(data);
-            }
-          } else if (payload.eventType === "DELETE") {
-            // 사용자 삭제 - 로컬에서 즉시 제거
-            const deletedUser = payload.old as OnlineUser;
-
-            // 전체 목록을 다시 가져와서 정확한 상태 유지
-            const { data } = await supabase
-              .from("online_users")
-              .select("*")
-              .order("last_seen", { ascending: false });
-
-            if (data) {
-              setOnlineUsers(data);
-            }
-          }
+      },
+      onOnlineUserDelete: async () => {
+        // 사용자 삭제 - 전체 목록을 다시 가져와서 정확한 상태 유지
+        const { data } = await daldalChatAPI.loadOnlineUsers();
+        if (data) {
+          setOnlineUsers(data);
         }
-      )
-      .subscribe();
+      },
+    });
 
-    return () => {
-      messagesSubscription.unsubscribe();
-      typingSubscription.unsubscribe();
-      onlineUsersSubscription.unsubscribe();
-    };
+    return unsubscribe;
   }, [isJoined, user]);
 
   // 타이핑 사용자 정리 (3초 이상 타이핑하지 않은 사용자 제거)
@@ -481,9 +316,9 @@ export default function DaldalChat() {
     const handleBeforeUnload = () => {
       if (isJoined && user) {
         // 타이핑 상태 제거
-        supabase.from("typing_status").delete().eq("user_id", user.id);
+        daldalChatAPI.removeTypingStatus(user.id);
         // 온라인 사용자에서 제거
-        supabase.from("online_users").delete().eq("user_id", user.id);
+        daldalChatAPI.removeOnlineUser(user.id);
       }
     };
 
@@ -492,9 +327,9 @@ export default function DaldalChat() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       if (isJoined && user) {
         // 타이핑 상태 제거
-        supabase.from("typing_status").delete().eq("user_id", user.id);
+        daldalChatAPI.removeTypingStatus(user.id);
         // 온라인 사용자에서 제거
-        supabase.from("online_users").delete().eq("user_id", user.id);
+        daldalChatAPI.removeOnlineUser(user.id);
       }
     };
   }, [isJoined, user]);
@@ -534,13 +369,9 @@ export default function DaldalChat() {
   const handleJoinWithNickname = async (nicknameToJoin: string) => {
     if (!user || !nicknameToJoin.trim()) return;
     try {
-      const { error } = await supabase.from("online_users").upsert(
-        {
-          user_id: user.id,
-          nickname: nicknameToJoin.trim(),
-          last_seen: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
+      const { error } = await daldalChatAPI.joinChat(
+        user.id,
+        nicknameToJoin.trim()
       );
       if (error) {
         console.error("Error joining chat:", error);
@@ -818,13 +649,9 @@ export default function DaldalChat() {
             return;
           }
           try {
-            const { error } = await supabase.from("online_users").upsert(
-              {
-                user_id: user.id,
-                nickname: newNickname.trim(),
-                last_seen: new Date().toISOString(),
-              },
-              { onConflict: "user_id" }
+            const { error } = await daldalChatAPI.updateNickname(
+              user.id,
+              newNickname.trim()
             );
             if (error) {
               console.error("Error updating nickname:", error);
