@@ -14,23 +14,19 @@ Next.js와 Supabase를 활용한 현대적인 데이팅 웹 애플리케이션�
 
 - 개인화된 자소설 작성 및 관리
 - 사진 업로드 (최대 6장)
-- 관심사 태그 시스템
 - 실시간 검색 및 필터링
-- 성별, 관심사별 필터링
+- 성별, 나이, 관심사별 필터링
 
 ### 💕 슈퍼 데이트 신청
 
 - 마음에 드는 상대방에게 특별한 데이트 제안
-- 진심 어린 메시지와 함께 신청
-- 신청 상태 관리 (대기/수락/거절)
+- 서로 신청하게 된 경우 1:1 채팅 가능
 
 ### 💬 달달톡 (익명 채팅)
 
 - 실시간 익명 채팅 시스템
 - 닉네임 설정 후 채팅방 입장
 - 실시간 접속자 수 표시
-- 타이핑 중인 사용자 표시 애니메이션
-- Enter 키로 빠른 메시지 전송
 
 ### 🎨 사용자 경험
 
@@ -41,7 +37,7 @@ Next.js와 Supabase를 활용한 현대적인 데이팅 웹 애플리케이션�
 
 ## 🛠 기술 스택
 
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **Frontend**: Next.js 14, TypeScript
 - **Backend**: Supabase (PostgreSQL, Auth, Storage)
 - **UI Components**: Lucide React Icons
 - **State Management**: React Context API
@@ -59,31 +55,16 @@ cd daldal
 ### 2. 의존성 설치
 
 ```bash
-npm install
-# 또는
 yarn install
 ```
 
 ### 3. 환경 변수 설정
 
-`.env.local` 파일을 생성하고 다음 변수들을 설정하세요:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-### 4. Supabase 데이터베이스 설정
-
-1. [Supabase](https://supabase.com)에서 새 프로젝트를 생성하세요.
-2. SQL Editor에서 `supabase-schema.sql` 파일의 내용을 실행하세요.
-3. 프로젝트 설정에서 URL과 anon key를 복사하여 환경 변수에 설정하세요.
+`.env.local` 파일을 원하신다면 개인적으로 연락! ㄱㄱ
 
 ### 5. 개발 서버 실행
 
 ```bash
-npm run dev
-# 또는
 yarn dev
 ```
 
@@ -91,47 +72,9 @@ yarn dev
 
 ## 🗄 데이터베이스 스키마
 
-### self_introductions 테이블
-
-- 사용자 기본 정보 (이름, 나이, 성별, 거주지)
-- 자소설 내용 (제목, 내용, 관심사 태그)
-- 사진 업로드 및 통계 (좋아요, 조회수)
-
-### super_date_requests 테이블
-
-- 슈퍼 데이트 신청 정보
-- 신청자 및 대상자 정보
-- 메시지 및 상태 관리
-
-### chat_messages 테이블
-
-- 익명 채팅 메시지 저장
-- 닉네임, 메시지 내용, 생성 시간
-
-### typing_status 테이블
-
-- 실시간 타이핑 상태 관리
-- 사용자별 타이핑 시작/종료 시간
-
-### online_users 테이블
-
-- 실시간 접속자 관리
-- 사용자별 마지막 활동 시간
-
-### chat_messages 테이블
-
-- 익명 채팅 메시지 저장
-- 닉네임, 메시지 내용, 생성 시간
-
-### typing_status 테이블
-
-- 실시간 타이핑 상태 관리
-- 사용자별 타이핑 시작/종료 시간
-
-### online_users 테이블
-
-- 실시간 접속자 관리
-- 사용자별 마지막 활동 시간
+```
+작성 예정
+```
 
 ## 🔒 보안
 
@@ -149,7 +92,6 @@ yarn dev
 - `/daldalChat` - 달달톡 (익명 채팅)
 - `/profile` - 내 정보 (로그인 필요)
 - `/rules` - 모임회칙
-- `/announcements` - 공지사항
 
 ## 🎯 주요 컴포넌트
 
@@ -160,6 +102,10 @@ yarn dev
 - `SelfIntroductionForm.tsx` - 자소설 작성 폼
 
 ## 🔧 API 함수
+
+```
+작성 예정
+```
 
 ### 자소설 관련
 
@@ -204,3 +150,7 @@ yarn dev
 ## 📞 문의
 
 프로젝트에 대한 문의사항이 있으시면 이슈를 생성해주세요.
+
+```
+
+```

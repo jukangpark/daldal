@@ -18,6 +18,7 @@ const categories = [
   "영화",
   "소통",
   "취미",
+  "19금",
 ];
 
 export default function BalanceGamePage() {
