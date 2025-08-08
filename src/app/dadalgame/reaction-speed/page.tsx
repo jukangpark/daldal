@@ -65,7 +65,6 @@ export default function ReactionSpeedPage() {
 
   // 게임 시작
   const startGame = () => {
-    console.log("게임 시작");
     setGameState({
       isPlaying: true,
       isWaiting: false,
@@ -126,8 +125,6 @@ export default function ReactionSpeedPage() {
 
   // 게임 종료
   const endGame = async () => {
-    console.log("게임 종료 - 현재 상태:", gameState);
-
     const gameDuration = gameState.gameStartTime
       ? Math.floor((Date.now() - gameState.gameStartTime) / 1000)
       : 0;
@@ -138,14 +135,6 @@ export default function ReactionSpeedPage() {
         gameState.reactionTimes.length
     );
 
-    console.log("계산된 결과:", {
-      bestReactionTime,
-      averageReactionTime,
-      totalAttempts: gameState.totalRounds,
-      successfulAttempts: gameState.reactionTimes.length,
-      gameDuration,
-    });
-
     setGameState((prev) => ({
       ...prev,
       isPlaying: false,
@@ -155,7 +144,6 @@ export default function ReactionSpeedPage() {
     if (user) {
       try {
         setIsLoading(true);
-        console.log("결과 저장 시작...");
         const result = await reactionSpeedAPI.saveResult({
           bestReactionTime,
           averageReactionTime,
@@ -163,7 +151,6 @@ export default function ReactionSpeedPage() {
           successfulAttempts: gameState.reactionTimes.length,
           gameDuration,
         });
-        console.log("결과 저장 완료:", result);
         await loadUserBestResult();
         await loadRankings();
       } catch (error) {
@@ -182,15 +169,12 @@ export default function ReactionSpeedPage() {
   // 랭킹 로드
   const loadRankings = async () => {
     try {
-      console.log("랭킹 로드 시작...");
       const { data, error } = await reactionSpeedAPI.getRankings(10);
       if (error) {
         console.error("랭킹 로드 오류:", error);
       } else if (data) {
-        console.log("랭킹 로드 성공:", data);
         setRankings(data);
       } else {
-        console.log("랭킹 데이터 없음");
         setRankings([]);
       }
     } catch (err) {

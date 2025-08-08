@@ -78,20 +78,13 @@ export default function BalanceGameDetailPage({
   };
 
   const handleVote = async (option: "A" | "B") => {
-    console.log("사용자 정보:", user);
-    console.log("게임 ID:", params.id);
     if (!user) {
       setShowLoginModal(true);
       return;
     }
 
-    console.log("사용자 정보:", user);
-    console.log("게임 ID:", params.id);
-
     try {
       setVoting(true);
-      console.log("투표 시도:", { gameId: params.id, userId: user.id, option });
-
       const { error } = await balanceGameAPI.vote(params.id, user.id, option);
 
       if (error) {
@@ -100,7 +93,6 @@ export default function BalanceGameDetailPage({
         return;
       }
 
-      console.log("투표 성공!");
       setUserVote(option);
       await fetchGameData(); // 결과 새로고침
     } catch (error) {

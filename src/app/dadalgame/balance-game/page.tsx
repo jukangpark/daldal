@@ -29,8 +29,6 @@ export default function BalanceGamePage() {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  console.log("games", games);
-
   useEffect(() => {
     // user가 로드된 후에만 fetchGames 호출
     if (user !== undefined) {

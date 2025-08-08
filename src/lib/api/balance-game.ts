@@ -97,8 +97,6 @@ const balanceGameAPI = {
 
   // 투표하기
   vote: async (gameId: string, userId: string, option: "A" | "B") => {
-    console.log("API 투표 호출:", { gameId, userId, option });
-
     const { data, error } = await supabase.from("balance_game_votes").upsert(
       {
         game_id: gameId,
@@ -110,7 +108,6 @@ const balanceGameAPI = {
       }
     );
 
-    console.log("API 투표 결과:", { data, error });
     return { data, error };
   },
 
