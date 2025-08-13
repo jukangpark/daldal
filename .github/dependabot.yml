@@ -5,7 +5,31 @@
 
 version: 2
 updates:
-  - package-ecosystem: "" # See documentation for possible values
+  # Enable version updates for npm/yarn
+  # Note: Even when using yarn, we use "npm" as the package-ecosystem
+  # Dependabot automatically detects yarn.lock and uses yarn accordingly
+  - package-ecosystem: "npm"
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    # Limit to security updates for major version updates
+    open-pull-requests-limit: 10
+    # Group minor and patch updates together
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Ignore major version updates for specific packages that might break things
+    ignore:
+      # Ignore major version updates for Next.js and React
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
