@@ -3,6 +3,7 @@ import categoryInfo from "./rulesCategoryInfo";
 import honorCategoryInfo from "./honorCategoryInfo";
 import { voteCategories, getIconComponent } from "./voteCategories";
 import games from "./games";
+import balanceGameCategories from "./balanceGameCategories";
 
 export {
   rules,
@@ -11,4 +12,5 @@ export {
   voteCategories,
   getIconComponent,
   games,
+  balanceGameCategories,
 };

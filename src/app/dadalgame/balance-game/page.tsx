@@ -7,19 +7,7 @@ import Link from "next/link";
 import balanceGameAPI from "@/lib/api/balance-game";
 import { BalanceGameWithStats } from "@/lib/types/balance-game";
 import LoginModal from "@/components/LoginModal";
-
-const categories = [
-  "전체",
-  "연애",
-  "데이트",
-  "일반",
-  "음식",
-  "여행",
-  "영화",
-  "소통",
-  "취미",
-  "19금",
-];
+import { balanceGameCategories } from "@/app/constants";
 
 export default function BalanceGamePage() {
   const { user } = useAuth();
@@ -138,7 +126,7 @@ export default function BalanceGamePage() {
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               카테고리:
             </span>
-            {categories.map((category) => (
+            {balanceGameCategories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
