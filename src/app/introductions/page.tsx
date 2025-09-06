@@ -11,6 +11,7 @@ import {
   Loader2,
   Calendar,
   X,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
@@ -307,8 +308,44 @@ export default function IntroductionsPage() {
           슈데권을 신청해! 일단 질러 ⭐️
         </p>
 
-        {/* 자소설 작성하기 버튼 */}
+        {/* AI 매칭 서비스 버튼 */}
         <div className="mt-8">
+          {user ? (
+            hasExistingIntroduction ? (
+              <button
+                onClick={() => router.push("/ai-matching")}
+                className="inline-flex items-center px-6 py-3 font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-lg transition-colors duration-200 hover:from-purple-700 hover:to-pink-700 hover:shadow-xl"
+              >
+                <Sparkles className="mr-2 w-5 h-5" />
+                AI 매칭 서비스
+              </button>
+            ) : (
+              <div className="space-y-4">
+                <button
+                  onClick={() => router.push("/ai-matching")}
+                  className="inline-flex items-center px-6 py-3 font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-lg transition-colors duration-200 hover:from-purple-700 hover:to-pink-700 hover:shadow-xl"
+                >
+                  <Sparkles className="mr-2 w-5 h-5" />
+                  AI 매칭 서비스
+                </button>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  * AI 매칭을 이용하려면 먼저 자소설을 작성해주세요
+                </p>
+              </div>
+            )
+          ) : (
+            <button
+              onClick={() => setShowLoginModal(true)}
+              className="inline-flex items-center px-6 py-3 font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-lg transition-colors duration-200 hover:from-purple-700 hover:to-pink-700 hover:shadow-xl"
+            >
+              <Sparkles className="mr-2 w-5 h-5" />
+              로그인하고 AI 매칭하기
+            </button>
+          )}
+        </div>
+
+        {/* 자소설 작성하기 버튼 */}
+        <div className="mt-4">
           {user ? (
             hasExistingIntroduction ? (
               <button

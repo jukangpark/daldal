@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import selfIntroductionAPI from "@/lib/api/self-introduction";
 import selfIntroductionCommentAPI from "@/lib/api/self-introduction-comment";
 import { SelfIntroduction, SelfIntroductionComment } from "@/lib/types";
-import { ArrowLeft, Loader2, X, Send } from "lucide-react";
+import { ArrowLeft, Loader2, X, Send, Heart, Sparkles } from "lucide-react";
 import SelfIntroductionCard from "@/components/SelfIntroductionCard";
 
 export default function IntroductionDetailPage() {
@@ -235,6 +235,22 @@ export default function IntroductionDetailPage() {
         introduction={introduction}
         showEditButtons={false}
       />
+
+      {/* AI 궁합 보기 버튼 - 로그인된 사용자이고 다른 사람의 자소설인 경우에만 표시 */}
+      {user && introduction && user.id !== introduction.user_id && (
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => router.push(`/ai-compatibility/${introduction.id}`)}
+            className="inline-flex items-center px-6 py-3 font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-lg transition-colors duration-200 hover:from-purple-700 hover:to-pink-700 hover:shadow-xl"
+          >
+            <Sparkles className="mr-2 w-5 h-5" />
+            AI 궁합 보기
+          </button>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            AI가 분석한 우리의 궁합을 확인해보세요
+          </p>
+        </div>
+      )}
 
       {/* 댓글 섹션 */}
       <div className="mt-8 card">
