@@ -310,29 +310,31 @@ export default function IntroductionsPage() {
 
         {/* AI 매칭 서비스 버튼 */}
         <div className="mt-8">
-          {user ? (
-            hasExistingIntroduction ? (
+          {loading ? (
+            <div className="space-y-4">
+              <div className="mx-auto w-48 h-12 bg-gray-200 rounded-lg animate-pulse dark:bg-gray-700"></div>
+              <div className="mx-auto w-80 h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-700"></div>
+            </div>
+          ) : user ? (
+            <div className="space-y-4">
               <button
                 onClick={() => router.push("/ai-matching")}
-                className="inline-flex items-center px-6 py-3 font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-lg transition-colors duration-200 hover:from-purple-700 hover:to-pink-700 hover:shadow-xl"
+                disabled={!hasExistingIntroduction}
+                className={`inline-flex items-center px-6 py-3 font-medium rounded-lg shadow-lg transition-colors duration-200 ${
+                  hasExistingIntroduction
+                    ? "text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 hover:shadow-xl"
+                    : "text-gray-400 bg-gray-200 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"
+                }`}
               >
                 <Sparkles className="mr-2 w-5 h-5" />
                 AI 매칭 서비스
               </button>
-            ) : (
-              <div className="space-y-4">
-                <button
-                  onClick={() => router.push("/ai-matching")}
-                  className="inline-flex items-center px-6 py-3 font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-lg transition-colors duration-200 hover:from-purple-700 hover:to-pink-700 hover:shadow-xl"
-                >
-                  <Sparkles className="mr-2 w-5 h-5" />
-                  AI 매칭 서비스
-                </button>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  * AI 매칭을 이용하려면 먼저 자소설을 작성해주세요
-                </p>
-              </div>
-            )
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {hasExistingIntroduction
+                  ? "AI가 당신의 자소설을 분석하여 최고의 궁합을 찾아드립니다"
+                  : "* AI 매칭을 이용하려면 먼저 자소설을 작성해주세요"}
+              </p>
+            </div>
           ) : (
             <button
               onClick={() => setShowLoginModal(true)}
@@ -346,7 +348,9 @@ export default function IntroductionsPage() {
 
         {/* 자소설 작성하기 버튼 */}
         <div className="mt-4">
-          {user ? (
+          {loading ? (
+            <div className="mx-auto w-48 h-12 bg-gray-200 rounded-lg animate-pulse dark:bg-gray-700"></div>
+          ) : user ? (
             hasExistingIntroduction ? (
               <button
                 disabled
