@@ -9,20 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.61.0",
+    "@anthropic-ai/sdk": "^0.69.0",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
-    "lucide-react": "^0.294.0",
-    "next": "14.0.0",
+    "lucide-react": "^0.554.0",
+    "next": "14.2.33",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
-    "@supabase/supabase-js": "^2.47.1",
+    "@supabase/supabase-js": "^2.81.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "autoprefixer": "^10.4.14",
+    "autoprefixer": "^10.4.22",
     "eslint": "^8",
     "eslint-config-next": "14.0.0",
     "postcss": "^8.4.24",
