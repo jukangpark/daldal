@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, User, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -21,6 +21,29 @@ export default function LoginModal({
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [rememberId, setRememberId] = useState(false);
+
+  // 마지막 로그인 이메일 불러오기 (모달이 열릴 때마다 확인)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    try {
+      const savedEmail =
+        typeof window !== "undefined"
+          ? window.localStorage.getItem("daldal_last_login_email")
+          : null;
+
+      if (savedEmail) {
+        setEmail(savedEmail);
+        setRememberId(true);
+      } else {
+        // 저장된 아이디가 없으면 체크 해제
+        setRememberId(false);
+      }
+    } catch (e) {
+      console.error("Failed to read saved login email:", e);
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +60,20 @@ export default function LoginModal({
       if (error) {
         setError(error.message || "로그인에 실패했습니다.");
       } else {
+        // 아이디 저장하기 처리
+        try {
+          if (rememberId) {
+            window.localStorage.setItem(
+              "daldal_last_login_email",
+              email.trim()
+            );
+          } else {
+            window.localStorage.removeItem("daldal_last_login_email");
+          }
+        } catch (e) {
+          console.error("Failed to persist login email:", e);
+        }
+
         onClose();
         setEmail("");
         setPassword("");
@@ -115,6 +152,19 @@ export default function LoginModal({
                 )}
               </button>
             </div>
+          </div>
+
+          {/* 아이디 저장하기 */}
+          <div className="flex justify-between items-center">
+            <label className="flex items-center text-sm text-gray-600">
+              <input
+                type="checkbox"
+                className="mr-2 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                checked={rememberId}
+                onChange={(e) => setRememberId(e.target.checked)}
+              />
+              아이디 저장하기
+            </label>
           </div>
 
           <button

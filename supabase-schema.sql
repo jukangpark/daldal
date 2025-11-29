@@ -292,3 +292,121 @@ CREATE POLICY "sexy_test_results_delete_policy" ON sexy_test_results
 CREATE INDEX IF NOT EXISTS idx_sexy_test_results_user_id ON sexy_test_results(user_id);
 CREATE INDEX IF NOT EXISTS idx_sexy_test_results_created_at ON sexy_test_results(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_sexy_test_results_personality_type ON sexy_test_results(personality_type); 
+
+-- =========================================
+-- 소개팅 카드 & 신청 카드 테이블
+-- =========================================
+
+-- 소개팅 카드 (주선자가 작성하는 카드)
+CREATE TABLE IF NOT EXISTS dating_cards (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  matchmaker_user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+
+  -- 소개 대상자 기본 정보
+  user_name TEXT NOT NULL,
+  user_age INTEGER NOT NULL CHECK (user_age >= 18 AND user_age <= 100),
+  user_gender TEXT NOT NULL CHECK (user_gender IN ('male', 'female')),
+  location TEXT NOT NULL,
+  mbti TEXT,
+
+  -- 소개 대상자 상세 정보
+  introduction TEXT NOT NULL,
+  interests TEXT[] DEFAULT '{}',
+  photos TEXT[] DEFAULT '{}',
+  smoke TEXT,
+  alcohol TEXT,
+  charm_appeal TEXT,
+  hobbies TEXT,
+  special_skills TEXT,
+  ideal_physical_type TEXT,
+  ideal_personality_type TEXT,
+  dating_style TEXT,
+
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE dating_cards ENABLE ROW LEVEL SECURITY;
+
+-- 누구나 소개팅 카드를 조회할 수 있음
+CREATE POLICY "dating_cards_select_policy" ON dating_cards
+  FOR SELECT USING (true);
+
+-- 로그인한 사용자만 자신의 소개팅 카드를 작성할 수 있음
+CREATE POLICY "dating_cards_insert_policy" ON dating_cards
+  FOR INSERT WITH CHECK (auth.uid() = matchmaker_user_id);
+
+-- 주선자만 자신의 소개팅 카드를 수정/삭제할 수 있음
+CREATE POLICY "dating_cards_update_policy" ON dating_cards
+  FOR UPDATE USING (auth.uid() = matchmaker_user_id);
+
+CREATE POLICY "dating_cards_delete_policy" ON dating_cards
+  FOR DELETE USING (auth.uid() = matchmaker_user_id);
+
+CREATE INDEX IF NOT EXISTS idx_dating_cards_matchmaker_user_id ON dating_cards(matchmaker_user_id);
+CREATE INDEX IF NOT EXISTS idx_dating_cards_created_at ON dating_cards(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_dating_cards_user_gender ON dating_cards(user_gender);
+
+-- 신청 카드 (소개팅 카드에 대한 신청 정보)
+CREATE TABLE IF NOT EXISTS dating_applications (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  dating_card_id UUID NOT NULL REFERENCES dating_cards(id) ON DELETE CASCADE,
+  applicant_user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+
+  name TEXT NOT NULL,
+  age INTEGER NOT NULL CHECK (age >= 18 AND age <= 100),
+  phone TEXT NOT NULL,
+  gender TEXT NOT NULL CHECK (gender IN ('male', 'female')),
+  location TEXT,
+  mbti TEXT,
+  smoke TEXT,
+  alcohol TEXT,
+  charm_appeal TEXT,
+  dating_style TEXT,
+  photos TEXT[] DEFAULT '{}',
+
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE dating_applications ENABLE ROW LEVEL SECURITY;
+
+-- 신청 카드 조회 정책:
+-- 1) 신청자 본인
+-- 2) 해당 소개팅 카드의 주선자
+CREATE POLICY "dating_applications_select_policy" ON dating_applications
+  FOR SELECT USING (
+    auth.uid() = applicant_user_id
+    OR auth.uid() = (
+      SELECT matchmaker_user_id
+      FROM dating_cards dc
+      WHERE dc.id = dating_card_id
+    )
+  );
+
+-- 로그인한 사용자만 신청 카드를 작성할 수 있음
+CREATE POLICY "dating_applications_insert_policy" ON dating_applications
+  FOR INSERT WITH CHECK (auth.uid() = applicant_user_id);
+
+-- 신청 카드 수정 정책:
+-- 1) 신청자는 자신의 신청 내용을 수정할 수 있음
+-- 2) 주선자는 status 를 포함해 신청 카드를 갱신할 수 있음
+CREATE POLICY "dating_applications_update_policy" ON dating_applications
+  FOR UPDATE USING (
+    auth.uid() = applicant_user_id
+    OR auth.uid() = (
+      SELECT matchmaker_user_id
+      FROM dating_cards dc
+      WHERE dc.id = dating_card_id
+    )
+  );
+
+-- 신청 카드 삭제 정책 (선택): 신청자 본인이 삭제 가능
+CREATE POLICY "dating_applications_delete_policy" ON dating_applications
+  FOR DELETE USING (auth.uid() = applicant_user_id);
+
+CREATE INDEX IF NOT EXISTS idx_dating_applications_card_id ON dating_applications(dating_card_id);
+CREATE INDEX IF NOT EXISTS idx_dating_applications_applicant_user_id ON dating_applications(applicant_user_id);
+CREATE INDEX IF NOT EXISTS idx_dating_applications_status ON dating_applications(status);

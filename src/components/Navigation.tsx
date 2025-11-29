@@ -20,6 +20,7 @@ import {
   Camera,
   Trophy,
   Gift,
+  Heart,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -41,6 +42,7 @@ const Navigation = () => {
   const navItems = [
     { href: "/super-date", label: "이벤트", icon: Gift },
     { href: "/introductions", label: "자소설 목록", icon: FileText },
+    { href: "/dating", label: "소개팅", icon: Heart },
     { href: "/rules", label: "모임회칙", icon: BookOpen },
     {
       href: "/dadalgame",

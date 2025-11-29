@@ -7,6 +7,9 @@ export * from "./self-introduction";
 // Super Date types
 export * from "./super-date";
 
+// Dating types
+export * from "./dating";
+
 // Honor types
 export * from "./honor";
 

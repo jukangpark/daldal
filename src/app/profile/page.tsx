@@ -18,7 +18,12 @@ import SelfIntroductionCard from "@/components/SelfIntroductionCard";
 import { useAuth } from "@/contexts/AuthContext";
 import selfIntroductionAPI from "@/lib/api/self-introduction";
 import superDateAPI from "@/lib/api/super-date";
-import { SelfIntroduction } from "@/lib/types";
+import datingAPI from "@/lib/api/dating";
+import type {
+  SelfIntroduction,
+  DatingCardRow,
+  DatingApplicationRow,
+} from "@/lib/types";
 
 export default function ProfilePage() {
   const { user, loading } = useAuth();
@@ -76,6 +81,18 @@ export default function ProfilePage() {
   // 사진 슬라이더 상태
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
+  // 소개팅 카드 & 신청 관련 상태
+  const [myDatingCards, setMyDatingCards] = useState<DatingCardRow[]>([]);
+  const [myCardsApplications, setMyCardsApplications] = useState<
+    Record<string, DatingApplicationRow[]>
+  >({});
+  const [loadingMyDatingCards, setLoadingMyDatingCards] = useState(true);
+
+  const [myApplications, setMyApplications] = useState<DatingApplicationRow[]>(
+    []
+  );
+  const [loadingMyApplications, setLoadingMyApplications] = useState(true);
+
   // 로그인 상태 확인 및 자소설 데이터 로드
   useEffect(() => {
     if (!loading && !user) {
@@ -87,6 +104,7 @@ export default function ProfilePage() {
       loadSelfIntroduction();
       loadPeopleWhoSelectedMe();
       loadConnectedPeople();
+      loadMyDatingData();
     }
   }, [user, loading, router]);
 
@@ -119,6 +137,82 @@ export default function ProfilePage() {
       setError("자소설을 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoadingSelfIntro(false);
+    }
+  };
+
+  // 내가 작성한 소개팅 카드 & 해당 카드의 신청 목록 + 내가 신청한 카드 목록 로드
+  const loadMyDatingData = async () => {
+    if (!user) return;
+
+    // 내가 작성한 카드들
+    try {
+      setLoadingMyDatingCards(true);
+      const { data: cards, error } = await datingAPI.getCardsByMatchmaker();
+      if (error) {
+        console.error("내 소개팅 카드 로드 오류:", error);
+      }
+      const safeCards = cards || [];
+      setMyDatingCards(safeCards);
+
+      // 해당 카드들에 대한 신청 목록 한 번에 가져오기
+      if (safeCards.length > 0) {
+        const cardIds = safeCards.map((c) => c.id);
+        const { data: apps, error: appError } = await supabase
+          .from("dating_applications")
+          .select("*")
+          .in("dating_card_id", cardIds)
+          .order("created_at", { ascending: false });
+
+        if (appError) {
+          console.error("소개팅 신청 목록 로드 오류:", appError);
+          setMyCardsApplications({});
+        } else {
+          const grouped: Record<string, DatingApplicationRow[]> = {};
+          (apps as DatingApplicationRow[] | null)?.forEach((app) => {
+            if (!grouped[app.dating_card_id]) {
+              grouped[app.dating_card_id] = [];
+            }
+            grouped[app.dating_card_id].push(app);
+          });
+          setMyCardsApplications(grouped);
+        }
+      } else {
+        setMyCardsApplications({});
+      }
+    } catch (err) {
+      console.error("내 소개팅 카드 로드 중 예외:", err);
+    } finally {
+      setLoadingMyDatingCards(false);
+    }
+
+    // 내가 신청한 카드들
+    try {
+      setLoadingMyApplications(true);
+      const {
+        data: { user: currentUser },
+      } = await supabase.auth.getUser();
+      if (!currentUser) {
+        setMyApplications([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("dating_applications")
+        .select("*")
+        .eq("applicant_user_id", currentUser.id)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("내 신청 카드 목록 로드 오류:", error);
+        setMyApplications([]);
+      } else {
+        setMyApplications((data as DatingApplicationRow[]) || []);
+      }
+    } catch (err) {
+      console.error("내 신청 카드 목록 로드 중 예외:", err);
+      setMyApplications([]);
+    } finally {
+      setLoadingMyApplications(false);
     }
   };
 
@@ -673,6 +767,263 @@ export default function ProfilePage() {
                   자소설 목록 보기
                 </Link>
               </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 내가 작성한 소개팅 카드 목록 */}
+      <div className="mt-8">
+        <div className="card">
+          <div className="mb-4">
+            <h2 className="mb-1 text-2xl font-bold text-gray-900 dark:text-white">
+              내가 작성한 소개팅 카드
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              각 카드별 신청자 목록과 승인 상태를 확인할 수 있습니다.
+            </p>
+          </div>
+
+          {loadingMyDatingCards ? (
+            <div className="py-8 space-y-3">
+              {[1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="p-4 rounded-lg border border-gray-200 animate-pulse dark:border-gray-700"
+                >
+                  <div className="w-40 h-4 mb-2 bg-gray-200 rounded dark:bg-gray-700" />
+                  <div className="w-64 h-3 bg-gray-200 rounded dark:bg-gray-700" />
+                </div>
+              ))}
+            </div>
+          ) : myDatingCards.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                아직 작성한 소개팅 카드가 없습니다.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {myDatingCards.map((card) => {
+                const apps = myCardsApplications[card.id] || [];
+                const pendingCount = apps.filter(
+                  (a) => a.status === "pending"
+                ).length;
+                const approvedCount = apps.filter(
+                  (a) => a.status === "approved"
+                ).length;
+                const rejectedCount = apps.filter(
+                  (a) => a.status === "rejected"
+                ).length;
+
+                return (
+                  <div
+                    key={card.id}
+                    className="p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          {card.user_name} ({card.user_age}세)
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          {card.location}
+                          {card.mbti && ` · ${card.mbti}`}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => router.push(`/dating/${card.id}`)}
+                        className="px-3 py-1 text-xs font-medium text-primary-600 bg-primary-50 rounded-md hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-300"
+                      >
+                        카드 보러가기
+                      </button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-3 mb-3 text-xs text-gray-600 dark:text-gray-300">
+                      <span>
+                        전체 신청: <b>{apps.length}</b>개
+                      </span>
+                      <span>
+                        승인: <b>{approvedCount}</b>개
+                      </span>
+                      <span>
+                        대기: <b>{pendingCount}</b>개
+                      </span>
+                      <span>
+                        거절: <b>{rejectedCount}</b>개
+                      </span>
+                    </div>
+
+                    {apps.length > 0 ? (
+                      <div className="space-y-2">
+                        <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-200">
+                          신청자 목록
+                        </h3>
+                        {apps.map((app) => (
+                          <div
+                            key={app.id}
+                            className="flex flex-wrap gap-3 justify-between items-center px-3 py-2 text-xs rounded-md border border-gray-100 dark:border-gray-700"
+                          >
+                            <div className="space-y-1">
+                              <div className="flex flex-wrap gap-2 items-center">
+                                <span className="font-semibold text-gray-900 dark:text-white">
+                                  {app.name} ({app.age}세,{" "}
+                                  {app.gender === "male" ? "남성" : "여성"})
+                                </span>
+                                {app.location && (
+                                  <span className="text-gray-500 dark:text-gray-400">
+                                    · {app.location}
+                                  </span>
+                                )}
+                                {app.mbti && (
+                                  <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-200">
+                                    {app.mbti}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex flex-wrap gap-2 text-gray-600 dark:text-gray-300">
+                                {app.charm_appeal && (
+                                  <span>매력: {app.charm_appeal}</span>
+                                )}
+                                {app.dating_style && (
+                                  <span>연애 스타일: {app.dating_style}</span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                                  상태:
+                                </span>
+                                <span
+                                  className={`px-2 py-0.5 text-[10px] font-semibold rounded-full ${
+                                    app.status === "approved"
+                                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                                      : app.status === "rejected"
+                                      ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                                      : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
+                                  }`}
+                                >
+                                  {app.status === "approved"
+                                    ? "승인"
+                                    : app.status === "rejected"
+                                    ? "거절"
+                                    : "대기"}
+                                </span>
+                              </div>
+                              {app.status === "approved" && (
+                                <div className="text-[11px] text-green-600 dark:text-green-400">
+                                  연락처: {app.phone}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex flex-wrap gap-1">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  router.push(`/dating/applications/${app.id}`)
+                                }
+                                className="px-2 py-1 text-[11px] font-medium text-primary-600 bg-primary-50 rounded border border-primary-100 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-300"
+                              >
+                                신청자 자세히 보기
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        아직 이 카드에 신청한 사람이 없습니다.
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 내가 신청한 소개팅 카드 목록 */}
+      <div className="mt-8 mb-8">
+        <div className="card">
+          <div className="mb-4">
+            <h2 className="mb-1 text-2xl font-bold text-gray-900 dark:text-white">
+              소개팅 신청 내역
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              내가 신청한 카드의 승인/대기/거절 상태를 확인할 수 있습니다.
+            </p>
+          </div>
+
+          {loadingMyApplications ? (
+            <div className="py-8 text-center">
+              <Loader2 className="w-6 h-6 mx-auto mb-2 animate-spin text-primary-600" />
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                신청 내역을 불러오는 중...
+              </p>
+            </div>
+          ) : myApplications.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                아직 신청한 소개팅 카드가 없습니다.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {myApplications.map((app) => (
+                <div
+                  key={app.id}
+                  className="flex flex-wrap gap-3 justify-between items-center px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="space-y-1 text-xs">
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                        {app.name} ({app.age}세,{" "}
+                        {app.gender === "male" ? "남성" : "여성"})
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                        상태:
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 text-[10px] font-semibold rounded-full ${
+                          app.status === "approved"
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                            : app.status === "rejected"
+                            ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                            : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
+                        }`}
+                      >
+                        {app.status === "approved"
+                          ? "승인"
+                          : app.status === "rejected"
+                          ? "거절"
+                          : "대기"}
+                      </span>
+                    </div>
+                    {app.status === "approved" && (
+                      <div className="px-3 py-2 mt-2 text-xs font-medium text-green-700 bg-green-50 rounded-lg border border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800">
+                        🎉 축하드립니다! 곧 주선자에게 연락이 올거예요!
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col items-end gap-1 text-[11px] text-gray-400 dark:text-gray-500">
+                    <span>
+                      신청일:{" "}
+                      {new Date(app.created_at).toLocaleDateString("ko-KR")}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/dating/${app.dating_card_id}`)}
+                      className="px-3 py-1 text-[11px] font-medium text-primary-600 bg-primary-50 rounded-md hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-300"
+                    >
+                      신청한 카드 자세히 보기
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
