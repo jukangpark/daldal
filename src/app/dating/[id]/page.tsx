@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import UserAvatar from "@/components/UserAvatar";
 import MbtiBadge from "@/components/MbtiBadge";
+import LoginModal from "@/components/LoginModal";
+import SignupModal from "@/components/SignupModal";
 import { useAuth } from "@/contexts/AuthContext";
 import datingAPI from "@/lib/api/dating";
 import fileAPI from "@/lib/api/file";
@@ -48,6 +50,8 @@ export default function DatingDetailPage() {
   }
 
   const [showApplyModal, setShowApplyModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
   const [applyForm, setApplyForm] = useState<ApplicationForm>({
     name: "",
     age: "",
@@ -504,7 +508,11 @@ export default function DatingDetailPage() {
               <>
                 <button
                   onClick={() => {
-                    setShowApplyModal(true);
+                    if (!user) {
+                      setShowLoginModal(true);
+                    } else {
+                      setShowApplyModal(true);
+                    }
                   }}
                   className="inline-flex items-center px-5 py-2 text-sm font-medium text-white rounded-lg bg-primary-600 hover:bg-primary-700"
                 >
@@ -791,6 +799,25 @@ export default function DatingDetailPage() {
           </div>
         </div>
       )}
+
+      {/* 로그인/회원가입 모달 */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onSwitchToSignup={() => {
+          setShowLoginModal(false);
+          setShowSignupModal(true);
+        }}
+      />
+
+      <SignupModal
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        onSwitchToLogin={() => {
+          setShowSignupModal(false);
+          setShowLoginModal(true);
+        }}
+      />
     </div>
   );
 }
