@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-export default function AuthCallback() {
+// 동적 렌더링 강제
+export const dynamic = 'force-dynamic';
+
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
@@ -119,5 +122,24 @@ export default function AuthCallback() {
         <div className="mx-auto w-8 h-8 rounded-full border-2 animate-spin border-primary-600 border-t-transparent"></div>
       </div>
     </div>
+  );
+}
+
+export default function AuthCallback() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900">
+          <div className="text-center">
+            <div className="mx-auto mb-4 w-16 h-16 rounded-full border-4 animate-spin border-primary-600 border-t-transparent"></div>
+            <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
+              로딩 중...
+            </h2>
+          </div>
+        </div>
+      }
+    >
+      <AuthCallbackContent />
+    </Suspense>
   );
 }

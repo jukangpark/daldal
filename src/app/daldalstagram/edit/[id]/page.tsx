@@ -2,14 +2,17 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { Camera, ArrowLeft, Upload, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import daldalstagramAPI from "@/lib/api/daldalstagram";
 import fileAPI from "@/lib/api/file";
 import { DaldalstagramPost } from "@/lib/types";
 
-const DaldalstagramEditPage = () => {
+// 동적 렌더링 강제
+export const dynamic = 'force-dynamic';
+
+const DaldalstagramEditPageContent = () => {
   const { user } = useAuth();
   const router = useRouter();
   const params = useParams();
@@ -51,7 +54,7 @@ const DaldalstagramEditPage = () => {
         setIsLoading(false);
       }
     }
-  }, [user, postId]);
+  }, [user, postId, searchParams]);
 
   const fetchPostData = async () => {
     try {
@@ -398,6 +401,27 @@ const DaldalstagramEditPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const DaldalstagramEditPage = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <div className="px-4 py-8 mx-auto max-w-4xl">
+            <div className="text-center">
+              <div className="mx-auto mb-4 w-16 h-16 rounded-full border-4 animate-spin border-primary-600 border-t-transparent"></div>
+              <p className="text-gray-600 dark:text-gray-400">
+                로딩 중...
+              </p>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <DaldalstagramEditPageContent />
+    </Suspense>
   );
 };
 
